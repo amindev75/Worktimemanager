@@ -11,14 +11,17 @@ defmodule TimeManagerWeb.ClockController do
     render(conn, :index, clocks: clocks)
   end
 
-  def create(conn, %{"clock" => clock_params}) do
-    with {:ok, %Clock{} = clock} <- TimeManagement.create_clock(clock_params) do
+  def create(conn, %{"clock" => clock_params, "userId" => user_id}) do
+    updated_params = Map.put(clock_params, "user_id", String.to_integer(user_id))
+
+    with {:ok, %Clock{} = clock} <- TimeManagement.create_clock(updated_params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/clocks/#{clock}")
       |> render(:show, clock: clock)
     end
   end
+
 
   def show(conn, %{"id" => id}) do
     clock = TimeManagement.get_clock!(id)

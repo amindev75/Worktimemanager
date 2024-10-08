@@ -4,7 +4,7 @@ defmodule TimeManager.TimeManagement.Workingtime do
 
   schema "workingtimes" do
     field :start, :naive_datetime
-    field :end, :naive_datetime
+    field :end_w, :naive_datetime
     field :user_id, :id
 
     timestamps(type: :utc_datetime)
@@ -13,7 +13,7 @@ defmodule TimeManager.TimeManagement.Workingtime do
   @doc false
   def changeset(workingtime, attrs) do
     workingtime
-    |> cast(attrs, [:start, :end])
-    |> validate_required([:start, :end])
+    |> cast(attrs, [:start, :end_w, :user_id])
+    |> validate_required([:start, :end_w, :user_id])
   end
 end

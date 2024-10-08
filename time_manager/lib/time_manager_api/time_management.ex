@@ -134,12 +134,29 @@ defmodule TimeManager.TimeManagement do
   def get_workingtime!(id), do: Repo.get!(Workingtime, id)
 
   def get_workingtimes_for_user(user_id) do
-    Repo.all(
-      from w in Workingtime,
+    query = from w in Workingtime,
       where: w.user_id == ^user_id,
       order_by: [asc: w.start]
+
+    Repo.all(query)
+  end
+
+  def get_workingtimes_for_user_by_id(user_id, id) do
+    query = from w in Workingtime,
+      where: w.user_id == ^user_id and w.id == ^id
+
+    Repo.all(query)
+  end
+
+
+  def list_workingtimes_with_params(start, end_w) do
+    Repo.all(
+      from u in Workingtime,
+      where: u.start == ^start and u.end_w == ^end_w
     )
   end
+
+
 
 
 
