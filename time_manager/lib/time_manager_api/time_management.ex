@@ -133,6 +133,16 @@ defmodule TimeManager.TimeManagement do
   """
   def get_workingtime!(id), do: Repo.get!(Workingtime, id)
 
+  def get_workingtimes_for_user(user_id) do
+    Repo.all(
+      from w in Workingtime,
+      where: w.user_id == ^user_id,
+      order_by: [asc: w.start]
+    )
+  end
+
+
+
   @doc """
   Creates a workingtime.
 

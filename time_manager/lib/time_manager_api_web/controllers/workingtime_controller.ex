@@ -20,6 +20,14 @@ defmodule TimeManagerWeb.WorkingtimeController do
     end
   end
 
+  def get_workingtimes(conn, %{"userId" => user_id}) do
+    workingtimes = TimeManagement.get_workingtimes_for_user(user_id)
+
+    render(conn, "index.json", workingtimes: workingtimes)
+  end
+
+
+
   def show(conn, %{"id" => id}) do
     workingtime = TimeManagement.get_workingtime!(id)
     render(conn, :show, workingtime: workingtime)

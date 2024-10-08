@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "mix_task",
+      "request": "launch",
+      "name": "mix phx.server",
+      "task": "phx.server", // Tâche Mix réelle à exécuter (par exemple, phx.server pour Phoenix)
+      "taskArgs": [],
+      "projectDir": "${workspaceRoot}",
+      "env": {
+        "MIX_ENV": "dev"
+      },
+      "exitAfterTaskReturns": false // Garder le débogueur actif après l'exécution de la tâche
+    },
+    {
+      "type": "elixir",
+      "request": "launch",
+      "name": "Elixir Debug",
+      "program": "${workspaceRoot}/lib/your_module.ex",
+      "projectDir": "${workspaceRoot}",
+      "env": {
+        "MIX_ENV": "dev"
+      }
+    }
+  ]
+}
