@@ -6,10 +6,10 @@ defmodule TimeManagerWeb.WorkingtimeController do
 
   action_fallback TimeManagerWeb.FallbackController
 
-  def index(conn, _params) do
-    workingtimes = TimeManagement.list_workingtimes()
-    render(conn, :index, workingtimes: workingtimes)
-  end
+  # def index(conn, _params) do
+  #   workingtimes = TimeManagement.list_workingtimes()
+  #   render(conn, :index, workingtimes: workingtimes)
+  # end
 
   def index(conn, params) do
     workingtimes = case params do
@@ -38,11 +38,20 @@ defmodule TimeManagerWeb.WorkingtimeController do
     end
   end
 
-  def get_workingtimes(conn, %{"userId" => user_id}) do
-    workingtimes = TimeManagement.get_workingtimes_for_user(user_id)
 
-    render(conn, "index.json", workingtimes: workingtimes)
+  def get_workingtimes(conn, %{"userId" => user_id}) do
+    case TimeManagement.get_user_by_id(user_id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "User not found"})
+
+      _user ->
+        workingtimes = TimeManagement.get_workingtimes_for_user(user_id)
+        render(conn, "index.json", workingtimes: workingtimes)
+    end
   end
+
 
   def get_workingtimes_by_id(conn, %{"userId" => user_id,"id" => id }) do
     workingtimes = TimeManagement.get_workingtimes_for_user_by_id(user_id, id)

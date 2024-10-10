@@ -141,6 +141,12 @@ defmodule TimeManager.TimeManagement do
     Repo.all(query)
   end
 
+
+  def get_user_by_id(user_id) do
+    Repo.get(User, user_id)
+  end
+
+
   def get_workingtimes_for_user_by_id(user_id, id) do
     query = from w in Workingtime,
       where: w.user_id == ^user_id and w.id == ^id

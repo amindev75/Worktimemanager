@@ -23,16 +23,25 @@ defmodule TimeManager.Accounts do
 
 
   def list_users_with_params(email, username) do
+    IO.puts("Recherche de l'utilisateur avec email: #{email} ou username: #{username}")
+
     users = Repo.all(
       from u in User,
       where: u.email == ^email or u.username == ^username
     )
 
+    IO.puts("Résultat de la requête: #{inspect(users)}")
+
     case users do
-      [] -> {:error, "Aucun utilisateur trouvé avec cet email ou nom d'utilisateur."}
-      _ -> {:ok, users}
+      [] ->
+        IO.puts("Aucun utilisateur trouvé.")
+        {:error, "Aucun utilisateur trouvé avec cet email ou nom d'utilisateur."}
+      _ ->
+        IO.puts("Utilisateurs trouvés : #{inspect(users)}")
+        {:ok, users}
     end
   end
+
 
 
   @doc """
