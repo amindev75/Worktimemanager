@@ -21,13 +21,19 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">{{ user.username }}</h5>
-            <p class="card-text">Email : {{ user.email }}</p>
+            <p class="card-text">Email: {{ user.email }}</p>
             <div class="d-flex justify-content-between">
               <button class="btn btn-primary" @click="openEditModal(user)">
                 <i class="fas fa-edit"></i> Edit
               </button>
               <button class="btn btn-danger" @click="deleteUser(user.id)">
                 <i class="fas fa-trash-alt"></i> Delete
+              </button>
+              <button
+                class="btn btn-warning"
+                @click="toggleClockStatus(user.clockId)"
+              >
+                <i class="fas fa-sync-alt"></i> Toggle Status
               </button>
             </div>
           </div>

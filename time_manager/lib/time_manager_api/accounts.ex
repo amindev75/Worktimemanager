@@ -7,6 +7,7 @@ defmodule TimeManager.Accounts do
   alias TimeManager.Repo
 
   alias TimeManager.Accounts.User
+  alias TimeManager.TimeManagement.{Clock, Workingtime}
 
   @doc """
   Returns the list of users.
@@ -17,9 +18,16 @@ defmodule TimeManager.Accounts do
       [%User{}, ...]
 
   """
-  def list_users do
-    Repo.all(User)
-  end
+
+
+def list_users_with_clocks do
+  User
+  |> preload(:clock)  # Précharge la clock unique pour chaque utilisateur
+  |> Repo.all()
+end
+
+
+
 
 
   def list_users_with_params(email, username) do
@@ -72,11 +80,33 @@ defmodule TimeManager.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_user(attrs \\ %{}) do
-    %User{}
-    |> User.changeset(attrs)
-    |> Repo.insert()
-  end
+def create_user(attrs \\ %{}, clock_attrs \\ %{}) do
+  Repo.transaction(fn ->
+    {:ok, %User{} = user} =
+      %User{}
+      |> User.changeset(attrs)
+      |> Repo.insert()
+
+    clock_attrs = Map.put(clock_attrs, :time, DateTime.utc_now())
+
+    case create_clock(Map.put(clock_attrs, :user_id, user.id)) do
+      {:ok, _clock} ->
+        IO.puts("Horloge créée avec succès pour l'utilisateur avec ID: #{user.id}")
+      {:error, changeset} ->
+        IO.puts("Échec de la création de l'horloge : #{inspect(changeset)}")
+    end
+
+    user
+  end)
+end
+
+defp create_clock(attrs \\ %{}) do
+  %Clock{}
+  |> Clock.changeset(attrs)
+  |> Repo.insert()
+end
+
+
 
   @doc """
   Updates a user.

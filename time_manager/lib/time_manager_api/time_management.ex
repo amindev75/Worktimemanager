@@ -27,6 +27,27 @@ defmodule TimeManager.TimeManagement do
     |> Repo.update()
   end
 
+  def get_clocks_for_user(user_id) do
+    IO.puts("Recherche des horloges pour l'utilisateur avec ID: #{user_id}")
+
+    clocks = Repo.all(
+      from c in Clock,
+      where: c.user_id == ^user_id
+    )
+
+    IO.puts("Résultat de la requête: #{inspect(clocks)}")
+
+    case clocks do
+      [] ->
+        IO.puts("Aucune horloge trouvée pour cet utilisateur.")
+        {:error, "Aucune horloge trouvée pour cet utilisateur."}
+      _ ->
+        IO.puts("Horloges trouvées : #{inspect(clocks)}")
+        {:ok, clocks}
+    end
+  end
+
+
   def delete_clock(%Clock{} = clock) do
     Repo.delete(clock)
   end
@@ -48,6 +69,14 @@ defmodule TimeManager.TimeManagement do
 
     Repo.all(query)
   end
+
+  def get_clock_for_user(user_id) do
+    query = from w in Clock,
+      where: w.user_id == ^user_id
+
+    Repo.one(query)
+  end
+
 
   def get_workingtimes_for_user_by_id(user_id, id) do
     query = from w in Workingtime,

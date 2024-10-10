@@ -12,7 +12,10 @@ defmodule TimeManagerWeb.Router do
     post "/workingtime/:userId", WorkingtimeController, :create
     get "/workingtime/:userId", WorkingtimeController, :get_workingtimes
     resources "/workingtime", WorkingtimeController, only: [:update, :delete]
-    resources "/clocks/:userId", ClockController, only: [:create, :index]
+    post "/clocks/:userId", ClockController, :create
+    get "/clocks/:userId", ClockController, :index
+    put "/clocks/:userId/:id", ClockController, :update
+
 
 
   end

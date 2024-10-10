@@ -7,23 +7,33 @@ defmodule TimeManagerWeb.UserController do
   action_fallback TimeManagerWeb.FallbackController
 
   def index(conn, params) do
+    IO.puts("Params reçus : #{inspect(params)}")
+
     case params do
       %{"email" => email, "username" => username} ->
+        IO.puts("Filtrage par email : #{email} et username : #{username}")
+
         case Accounts.list_users_with_params(email, username) do
           {:ok, users} ->
+            IO.puts("Nombre d'utilisateurs trouvés : #{length(users)}")
             render(conn, "index.json", users: users)
 
           {:error, message} ->
+            IO.puts("Erreur : #{message}")
             conn
             |> put_status(:not_found)
             |> json(%{error: message})
         end
 
       _ ->
-        users = Accounts.list_users()
+        IO.puts("Aucun paramètre de filtrage fourni. Récupération de tous les utilisateurs avec leurs clocks.")
+        users = Accounts.list_users_with_clocks()
+        IO.puts("Nombre d'utilisateurs récupérés : #{length(users)}")
         render(conn, "index.json", users: users)
     end
   end
+
+
 
 
 
