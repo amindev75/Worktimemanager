@@ -10,7 +10,6 @@
         data-bs-toggle="modal"
         data-bs-target="#addUserModal"
       >
-        ddd
         <i class="fas fa-plus"></i> Ajouter un utilisateur
       </button>
     </div>
@@ -24,7 +23,7 @@
             <h5 class="card-title">{{ user.username }}</h5>
             <p class="card-text">Email : {{ user.email }}</p>
             <div class="d-flex justify-content-between">
-              <button class="btn btn-primary">
+              <button class="btn btn-primary" @click="openEditModal(user)">
                 <i class="fas fa-edit"></i> Edit
               </button>
               <button class="btn btn-danger" @click="deleteUser(user.id)">
@@ -36,6 +35,7 @@
       </div>
     </div>
 
+    <!-- Modal pour ajouter un utilisateur -->
     <div
       class="modal fade"
       id="addUserModal"
@@ -86,6 +86,58 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal pour éditer un utilisateur -->
+    <div
+      class="modal fade"
+      id="editUserModal"
+      tabindex="-1"
+      aria-labelledby="editUserModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editUserModalLabel">
+              Modifier l'utilisateur
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="editUser">
+              <div class="mb-3">
+                <label for="editUsername" class="form-label"
+                  >Nom d'utilisateur</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editUsername"
+                  v-model="selectedUser.username"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="editEmail" class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="editEmail"
+                  v-model="selectedUser.email"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">Sauvegarder</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -100,6 +152,11 @@ export default {
     return {
       users: [],
       newUser: {
+        username: "",
+        email: "",
+      },
+      selectedUser: {
+        id: null,
         username: "",
         email: "",
       },
@@ -140,7 +197,7 @@ export default {
           },
         });
 
-        this.users.push(response.data);
+        this.users.push(response.data.data);
 
         this.newUser = { username: "", email: "" };
 
@@ -161,6 +218,44 @@ export default {
       } catch (error) {
         console.error(
           "Erreur lors de la suppression de l'utilisateur :",
+          error
+        );
+      }
+    },
+    openEditModal(user) {
+      this.selectedUser = { ...user }; // Pré-remplit les informations de l'utilisateur
+      const editModal = new bootstrap.Modal(
+        document.getElementById("editUserModal")
+      );
+      editModal.show();
+    },
+    async editUser() {
+      try {
+        const response = await axios.put(
+          `http://localhost:4000/api/users/${this.selectedUser.id}`,
+          {
+            user: {
+              username: this.selectedUser.username,
+              email: this.selectedUser.email,
+            },
+          }
+        );
+
+        const index = this.users.findIndex(
+          (user) => user.id === this.selectedUser.id
+        );
+        if (index !== -1) {
+          this.users[index] = response.data.data;
+        }
+
+        const modalElement = document.getElementById("editUserModal");
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la modification de l'utilisateur :",
           error
         );
       }

@@ -13,6 +13,10 @@ const goToUserManagement = () => {
   router.push("/user_management");
 };
 
+const goToWorkingTime = () => {
+  router.push("/workingtime");
+};
+
 onMounted(async () => {
   try {
     const { data: userData } = await axios.get(`${baseURI}/user`);
@@ -31,7 +35,9 @@ onMounted(async () => {
       <button class="btn btn-primary mx-2" @click="goToUserManagement">
         Gérer les utilisateurs
       </button>
-      <button class="btn btn-secondary mx-2">Gérer le temps de travail</button>
+      <button class="btn btn-secondary mx-2" @click="goToWorkingTime">
+        Gérer le temps de travail
+      </button>
     </div>
   </div>
 </template>

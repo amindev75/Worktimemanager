@@ -17,6 +17,11 @@ export const routes = [
     path: "/user_management",
     component: components["User"],
   },
+  {
+    path: "/workingtime",
+    name: "WorkingTimePage",
+    component: components["Workingtime"],
+  },
 ];
 
 const router = createRouter({
