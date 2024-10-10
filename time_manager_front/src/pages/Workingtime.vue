@@ -164,11 +164,6 @@ export default {
       } catch (error) {
         if (error.response && error.response.status === 404) {
           showAlert("Aucun utilisateur n'a été trouvé.");
-        } else {
-          console.error(
-            "Erreur lors de la recherche des utilisateurs :",
-            error
-          );
         }
       }
     };
@@ -187,11 +182,6 @@ export default {
       } catch (error) {
         if (error.response && error.response.status === 404) {
           showAlert("Cet utilisateur n'existe pas.");
-        } else {
-          console.error(
-            "Erreur lors de la récupération des working times :",
-            error
-          );
         }
       }
     };
@@ -233,7 +223,7 @@ export default {
           user_id: null,
         };
       } catch (error) {
-        console.error("Erreur lors de l'ajout du working time :", error);
+        // Intentionally left empty
       }
     };
 
@@ -242,10 +232,7 @@ export default {
         const response = await axios.get("http://localhost:4000/api/users");
         users.value = response.data.data || [];
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des utilisateurs :",
-          error
-        );
+        // Intentionally left empty
       }
     };
 
