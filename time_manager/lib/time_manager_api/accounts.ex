@@ -23,11 +23,17 @@ defmodule TimeManager.Accounts do
 
 
   def list_users_with_params(email, username) do
-    Repo.all(
+    users = Repo.all(
       from u in User,
-      where: u.email == ^email and u.username == ^username
+      where: u.email == ^email or u.username == ^username
     )
+
+    case users do
+      [] -> {:error, "Aucun utilisateur trouvé avec cet email ou nom d'utilisateur."}
+      _ -> {:ok, users}
+    end
   end
+
 
   @doc """
   Gets a single user.
