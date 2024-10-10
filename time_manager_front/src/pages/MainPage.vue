@@ -1,12 +1,19 @@
 <script setup>
 import { reactive, onMounted } from "vue";
-import axios from 'axios';
+import { useRouter } from "vue-router";
+import axios from "axios";
 
-const baseURI = "http://localhost:3000/user";
+const baseURI = "http://localhost:3000";
 
 const users = reactive([]);
 
-onMounted(async () => { 
+const router = useRouter();
+
+const goToUserManagement = () => {
+  router.push("/user_management");
+};
+
+onMounted(async () => {
   try {
     const { data: userData } = await axios.get(`${baseURI}/user`);
     users.push(...userData);
@@ -17,28 +24,33 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="card container users">
-    <h3>Utilisateurs</h3>
-    <div class="list">
-      <div v-for="user in users" :key="user.id" class="card user">
-        {{ user.name }}
-      </div>
+  <div class="container mt-5">
+    <h1 class="text-center mb-5">Bienvenue sur votre espace admin</h1>
+
+    <div class="d-flex justify-content-center mb-4">
+      <button class="btn btn-primary mx-2" @click="goToUserManagement">
+        Gérer les utilisateurs
+      </button>
+      <button class="btn btn-secondary mx-2">Gérer le temps de travail</button>
     </div>
   </div>
 </template>
 
 <style scoped>
 .users {
-  width: 30%;
-  margin-left: 0;
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
 }
 
-.occupied {
-  background-color: #2e2e44;
-}
-
-.available {
-  background-color: var(--primary);
+.user {
+  color: #ffffff;
+  background-color: #007bff;
+  width: fit-content;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
 }
 
 h3 {
@@ -53,12 +65,9 @@ h3 {
 
 .container {
   padding: 20px;
-  margin: 20px;
 }
 
-.user {
-  color: #ffffff;
-  width: fit-content;
-  padding: 5px 10px 5px;
+.btn {
+  padding: 10px 20px;
 }
 </style>
