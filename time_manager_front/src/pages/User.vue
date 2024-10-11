@@ -22,6 +22,11 @@
           <div class="card-body">
             <h5 class="card-title">{{ user.username }}</h5>
             <p class="card-text">Email: {{ user.email }}</p>
+            <p class="card-text">User ID: {{ user.id }}</p>
+            <p class="card-text">
+              Clock ID:
+              {{ clocks[user.id] ? clocks[user.id] : "No clock found" }}
+            </p>
             <div class="d-flex justify-content-between">
               <button class="btn btn-primary" @click="openEditModal(user)">
                 <i class="fas fa-edit"></i> Edit
@@ -31,7 +36,7 @@
               </button>
               <button
                 class="btn btn-warning"
-                @click="toggleClockStatus(user.clockId)"
+                @click="toggleClockStatus(clocks[user.id])"
               >
                 <i class="fas fa-sync-alt"></i> Toggle Status
               </button>
@@ -157,6 +162,7 @@ export default {
   data() {
     return {
       users: [],
+      clocks: {},
       newUser: {
         username: "",
         email: "",
@@ -187,6 +193,15 @@ export default {
       try {
         const response = await axios.get("http://localhost:4000/api/users");
         this.users = response.data.data;
+        this.users.forEach(async (user) => {
+          const clock = await this.fetchClock(user.id);
+          console.log("LA CLOCK", clock);
+          if (clock) {
+            this.clocks[user.id] = clock;
+          } else {
+            this.clocks[user.id] = null;
+          }
+        });
       } catch (error) {
         console.error(
           "Erreur lors de la récupération des utilisateurs :",
@@ -194,6 +209,29 @@ export default {
         );
       }
     },
+
+    async fetchClock(userId) {
+      try {
+        console.log(`Fetching clock for userId: ${userId}`);
+        const response = await axios.get(
+          `http://localhost:4000/api/clocks/${userId}`
+        );
+
+        console.log("Response from API:", response);
+
+        if (response.data) {
+          console.log("Clock found:", response.data.data.id);
+          return response.data.data.id;
+        } else {
+          console.log(`No clock found for userId: ${userId}`);
+          return null;
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération du clock :", error);
+        return null;
+      }
+    },
+
     async addUser() {
       try {
         const response = await axios.post("http://localhost:4000/api/users", {
@@ -216,11 +254,13 @@ export default {
         console.error("Erreur lors de la création de l'utilisateur :", error);
       }
     },
+
     async deleteUser(userId) {
       try {
         await axios.delete(`http://localhost:4000/api/users/${userId}`);
 
         this.users = this.users.filter((user) => user.id !== userId);
+        delete this.clocks[userId];
       } catch (error) {
         console.error(
           "Erreur lors de la suppression de l'utilisateur :",
@@ -228,13 +268,15 @@ export default {
         );
       }
     },
+
     openEditModal(user) {
-      this.selectedUser = { ...user }; // Pré-remplit les informations de l'utilisateur
+      this.selectedUser = { ...user };
       const editModal = new bootstrap.Modal(
         document.getElementById("editUserModal")
       );
       editModal.show();
     },
+
     async editUser() {
       try {
         const response = await axios.put(
