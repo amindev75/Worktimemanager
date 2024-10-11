@@ -18,6 +18,10 @@ export const routes = [
     component: components["User"],
   },
   {
+    path: "/chart_manager",
+    component: components["ChartManager"],
+  },
+  {
     path: "/workingtime",
     name: "WorkingTimePage",
     component: components["Workingtime"],

@@ -83,7 +83,7 @@ defmodule TimeManagerWeb.ClockController do
                 |> put_status(:ok)
                 |> json(%{
                   success: "Clock status updated and workingtime created and updated",
-                  clock: updated_clock  # Ici on renvoie le clock mis à jour
+                  clock: updated_clock
                 })
 
               {:error, reason} ->

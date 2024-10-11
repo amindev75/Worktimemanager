@@ -132,26 +132,24 @@ defmodule TimeManager.TimeManagement do
       new_status = !clock.status
       updated_time = NaiveDateTime.utc_now()
 
-      # Met à jour le clock et renvoie l'objet mis à jour
       updated_clock =
         clock
-        |> Clock.changeset(%{status: new_status, time: updated_time})
+        |> Clock.changeset(%{status: new_status, time: nil})
         |> Repo.update!()
 
       update_workingtime(workingtime, %{end_w: updated_time})
 
-      {:ok, updated_clock}  # Retourne l'objet clock mis à jour ici
+      {:ok, updated_clock}
     else
       new_status = !clock.status
       current_time = NaiveDateTime.utc_now()
 
-      # Met à jour le clock et renvoie l'objet mis à jour
       updated_clock =
         clock
         |> Clock.changeset(%{status: new_status, time: current_time})
         |> Repo.update!()
 
-      {:ok, updated_clock}  # Retourne l'objet clock mis à jour ici
+      {:ok, updated_clock}
     end
   end
 

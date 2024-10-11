@@ -32,11 +32,6 @@
 
             <h5 class="card-title">{{ user.username }}</h5>
             <p class="card-text">Email: {{ user.email }}</p>
-            <p class="card-text">User ID: {{ user.id }}</p>
-            <p class="card-text">
-              Clock ID:
-              {{ clocks[user.id] ? clocks[user.id].id : "No clock found" }}
-            </p>
             <div class="d-flex justify-content-between">
               <button class="btn btn-primary" @click="openEditModal(user)">
                 <i class="fas fa-edit"></i> Edit
