@@ -20,12 +20,17 @@
       <div v-for="user in users" :key="user.id" class="col-md-4 mb-3">
         <div class="card">
           <div class="card-body">
+            <div v-if="clocks[user.id]">
+              <div v-if="clocks[user.id].status">vert</div>
+              <div v-else>rouge</div>
+            </div>
+
             <h5 class="card-title">{{ user.username }}</h5>
             <p class="card-text">Email: {{ user.email }}</p>
             <p class="card-text">User ID: {{ user.id }}</p>
             <p class="card-text">
               Clock ID:
-              {{ clocks[user.id] ? clocks[user.id] : "No clock found" }}
+              {{ clocks[user.id] ? clocks[user.id].id : "No clock found" }}
             </p>
             <div class="d-flex justify-content-between">
               <button class="btn btn-primary" @click="openEditModal(user)">
@@ -151,7 +156,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import axios from "axios";
 import { useRouter } from "vue-router";
@@ -189,6 +193,22 @@ export default {
     this.fetchUsers();
   },
   methods: {
+    async toggleClockStatus(userId) {
+      try {
+        const response = await axios.put(
+          `http://localhost:4000/api/clocks/${userId}/toggle_status`
+        );
+        // Met à jour le statut dans l'interface utilisateur en fonction de la réponse
+        if (response.data && response.data.data) {
+          this.clocks[userId] = response.data.data;
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la mise à jour du statut du clock :",
+          error
+        );
+      }
+    },
     async fetchUsers() {
       try {
         const response = await axios.get("http://localhost:4000/api/users");
@@ -197,7 +217,7 @@ export default {
           const clock = await this.fetchClock(user.id);
           console.log("LA CLOCK", clock);
           if (clock) {
-            this.clocks[user.id] = clock;
+            this.clocks[user.id] = JSON.parse(JSON.stringify(clock));
           } else {
             this.clocks[user.id] = null;
           }
@@ -221,7 +241,7 @@ export default {
 
         if (response.data) {
           console.log("Clock found:", response.data.data.id);
-          return response.data.data.id;
+          return response.data.data;
         } else {
           console.log(`No clock found for userId: ${userId}`);
           return null;
