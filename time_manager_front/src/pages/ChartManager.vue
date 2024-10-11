@@ -6,10 +6,17 @@
       </button>
     </div>
     <h1 class="text-center mb-5">Statistiques des Utilisateurs</h1>
+    <select id="user-select" v-model="selectedUserId" @change="fetchWorkedDays">
+      <option disabled value="">Veuillez sélectionner un utilisateur</option>
+      <option v-for="user in users" :key="user.id" :value="user.id">
+        {{ user.username }}
+      </option>
+    </select>
+
     <div style="margin: 8vh">
       <div class="row mb-4">
         <div class="col-md-4 chart-container">
-          <Bar id="bar-chart" :data="barData" :options="chartOptions" />
+          <Bar :data="barData" :options="chartOptions" />
         </div>
         <div class="col-md-4 chart-container">
           <Line id="line-chart" :data="lineData" :options="chartOptions" />
@@ -19,7 +26,6 @@
         </div>
       </div>
       <div class="row">
-        <!-- Row 2: 2 charts -->
         <div class="col-md-6 chart-container">
           <Doughnut
             id="doughnut-chart"
@@ -81,6 +87,7 @@ const chartOptions = {
     },
     title: {
       display: true,
+      text: "Jours Travaillés par Mois",
     },
   },
   scales: {
@@ -92,12 +99,25 @@ const chartOptions = {
 
 // Bar chart data
 const barData = {
-  labels: ["January", "February", "March", "April", "May", "June"],
+  labels: [
+    "Janvier",
+    "Février",
+    "Mars",
+    "Avril",
+    "Mai",
+    "Juin",
+    "Juillet",
+    "Août",
+    "Septembre",
+    "Octobre",
+    "Novembre",
+    "Décembre",
+  ],
   datasets: [
     {
-      label: "Sales 2024 (in $)",
+      label: "Jours travaillés (2024)",
       backgroundColor: "#42A5F5",
-      data: [5000, 6000, 7000, 8000, 5500, 6200],
+      data: [], // Initialisez avec un tableau vide
     },
   ],
 };
@@ -159,6 +179,102 @@ const radarData = {
       data: [28, 48, 40, 19, 96],
     },
   ],
+};
+</script>
+
+<script>
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      users: [], // Pour stocker les utilisateurs
+      selectedUserId: "", // Pour stocker l'ID de l'utilisateur sélectionné
+      workedDaysByMonth: {}, // Pour stocker les jours travaillés par mois
+      barData: {
+        // Ajoutez barData ici
+        labels: [
+          "Janvier",
+          "Février",
+          "Mars",
+          "Avril",
+          "Mai",
+          "Juin",
+          "Juillet",
+          "Août",
+          "Septembre",
+          "Octobre",
+          "Novembre",
+          "Décembre",
+        ],
+        datasets: [
+          {
+            label: "Jours travaillés (2024)",
+            backgroundColor: "#42A5F5",
+            data: [], // Initialisez avec un tableau vide
+          },
+        ],
+      },
+    };
+  },
+  mounted() {
+    this.fetchUsers(); // Récupérer les utilisateurs lorsque le composant est monté
+  },
+  methods: {
+    async fetchUsers() {
+      try {
+        const response = await axios.get("http://localhost:4000/api/users");
+        this.users = response.data.data; // Accédez à la propriété 'data'
+        console.log(this.users); // Pour vérifier le contenu
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des utilisateurs :",
+          error
+        );
+      }
+    },
+
+    async fetchWorkedDays() {
+      if (!this.selectedUserId) return; // Ne rien faire si aucun utilisateur n'est sélectionné
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/stats/${this.selectedUserId}/worked_days_by_month`
+        );
+        this.workedDaysByMonth = response.data.worked_days_by_month;
+
+        // Mettre à jour les données du graphique avec les jours travaillés
+        const months = [
+          "Janvier",
+          "Février",
+          "Mars",
+          "Avril",
+          "Mai",
+          "Juin",
+          "Juillet",
+          "Août",
+          "Septembre",
+          "Octobre",
+          "Novembre",
+          "Décembre",
+        ];
+
+        // Initialisez les données du graphique avec 0 pour chaque mois
+        const workedDaysArray = months.map(
+          (month) => this.workedDaysByMonth[month] || 0
+        );
+
+        // Mettre à jour les données du graphique
+        this.barData.datasets[0].data = workedDaysArray;
+
+        console.log("Données des jours travaillés :", this.workedDaysByMonth);
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des jours travaillés :",
+          error
+        );
+      }
+    },
+  },
 };
 </script>
 

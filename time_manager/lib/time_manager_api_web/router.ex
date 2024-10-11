@@ -17,8 +17,7 @@ defmodule TimeManagerWeb.Router do
     get "/clocks/:userId", ClockController, :index
     put "/clocks/:userId/toggle_status", ClockController, :toggle_status
     put "/clocks/:userId/:id", ClockController, :update
-
-
+    get "/stats/:userId/worked_days_by_month", StatsController, :calculate_worked_days_by_month
 
   end
 
