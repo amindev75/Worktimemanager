@@ -39,11 +39,15 @@ defmodule TimeManagerWeb.ClockController do
     end
   end
 
-  def change_status_clock(clock_id) do
-    clock = Repo.get(Clock, clock_id)
+  def change_status_clock(user_id) do
+    IO.puts("Fetching clock for user ID: #{user_id}")
+
+    # Supposons que chaque utilisateur a un seul clock, sinon il faudra ajuster cette requête.
+    clock = Repo.get_by(Clock, user_id: user_id)
 
     case clock do
       nil ->
+        IO.puts("Clock not found for user ID: #{user_id}")
         {:error, "Clock not found"}
 
       %Clock{status: current_status} = clock ->
@@ -52,12 +56,36 @@ defmodule TimeManagerWeb.ClockController do
 
         case Repo.update(changeset) do
           {:ok, updated_clock} ->
-            {:ok, updated_clock}  # Return the updated clock
+            IO.puts("Clock updated successfully for user ID: #{user_id}")
+            {:ok, updated_clock}
+
           {:error, changeset} ->
-            {:error, changeset}  # Return the changeset in case of an error
+            IO.puts("Failed to update clock for user ID: #{user_id}")
+            {:error, changeset}
         end
     end
   end
+
+
+  def toggle_status(conn, %{"user_id" => user_id}) do
+    IO.puts("Received request to toggle status for user ID: #{user_id}")
+
+    case TimeManager.change_status_clock(user_id) do
+      {:ok, updated_clock} ->
+        IO.puts("Successfully toggled status for user ID: #{user_id}")
+        json(conn, %{data: updated_clock})
+
+      {:error, reason} ->
+        IO.puts("Error toggling status for user ID: #{user_id}, Reason: #{reason}")
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{error: reason})
+    end
+  end
+
+
+
+
 
 
 

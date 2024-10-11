@@ -15,6 +15,7 @@ defmodule TimeManagerWeb.Router do
     post "/clocks/:userId", ClockController, :create
     get "/clocks/:userId", ClockController, :index
     put "/clocks/:userId/:id", ClockController, :update
+    put "/api/clocks/:user_id/toggle_status", ClockController, :toggle_status
 
 
 
