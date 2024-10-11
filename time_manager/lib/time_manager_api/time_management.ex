@@ -131,6 +131,9 @@ defmodule TimeManager.TimeManagement do
 
       new_status = !clock.status
       updated_time = NaiveDateTime.utc_now()
+                       |> DateTime.from_naive!("Etc/UTC")
+                       |> DateTime.shift_zone!("Europe/Paris")
+                       |> DateTime.to_naive()
 
       updated_clock =
         clock
@@ -143,6 +146,9 @@ defmodule TimeManager.TimeManagement do
     else
       new_status = !clock.status
       current_time = NaiveDateTime.utc_now()
+                       |> DateTime.from_naive!("Etc/UTC")
+                       |> DateTime.shift_zone!("Europe/Paris")
+                       |> DateTime.to_naive()
 
       updated_clock =
         clock
@@ -152,6 +158,7 @@ defmodule TimeManager.TimeManagement do
       {:ok, updated_clock}
     end
   end
+
 
 
 end
