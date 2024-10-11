@@ -18,12 +18,17 @@
 
     <div class="row">
       <div v-for="user in users" :key="user.id" class="col-md-4 mb-3">
-        <div class="card">
+        <div class="card position-relative">
           <div class="card-body">
-            <div v-if="clocks[user.id]">
-              <div v-if="clocks[user.id].status">vert</div>
-              <div v-else>rouge</div>
-            </div>
+            <!-- Point rouge ou vert en haut à droite -->
+            <div
+              v-if="clocks[user.id]"
+              :class="{
+                'bg-success': clocks[user.id].status,
+                'bg-danger': !clocks[user.id].status,
+              }"
+              class="status-indicator position-absolute rounded-circle"
+            ></div>
 
             <h5 class="card-title">{{ user.username }}</h5>
             <p class="card-text">Email: {{ user.email }}</p>
@@ -41,7 +46,7 @@
               </button>
               <button
                 class="btn btn-warning"
-                @click="toggleClockStatus(clocks[user.id])"
+                @click="toggleClockStatus(user.id)"
               >
                 <i class="fas fa-sync-alt"></i> Toggle Status
               </button>
@@ -156,6 +161,16 @@
     </div>
   </div>
 </template>
+
+<style>
+.status-indicator {
+  width: 15px;
+  height: 15px;
+  top: 10px;
+  right: 10px;
+}
+</style>
+
 <script>
 import axios from "axios";
 import { useRouter } from "vue-router";
@@ -195,13 +210,19 @@ export default {
   methods: {
     async toggleClockStatus(userId) {
       try {
-        const response = await axios.put(
-          `http://localhost:4000/api/clocks/${userId}/toggle_status`
-        );
-        // Met à jour le statut dans l'interface utilisateur en fonction de la réponse
-        if (response.data && response.data.data) {
-          this.clocks[userId] = response.data.data;
-        }
+        await axios
+          .put(`http://localhost:4000/api/clocks/${userId}/toggle_status`)
+          .then((res) => {
+            console.log("salut");
+            console.log(res.data); // Pour afficher la réponse complète
+            if (res.data && res.data.clock) {
+              console.log(res.data.clock); // Affiche les informations de clock
+              this.clocks[userId] = res.data.clock; // Mets à jour le clock de l'utilisateur
+            }
+          })
+          .catch((err) => {
+            console.error(err); // En cas d'erreur
+          });
       } catch (error) {
         console.error(
           "Erreur lors de la mise à jour du statut du clock :",
