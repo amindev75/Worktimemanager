@@ -39,55 +39,6 @@ defmodule TimeManagerWeb.ClockController do
     end
   end
 
-  def change_status_clock(user_id) do
-    IO.puts("Fetching clock for user ID: #{user_id}")
-
-    # Supposons que chaque utilisateur a un seul clock, sinon il faudra ajuster cette requête.
-    clock = Repo.get_by(Clock, user_id: user_id)
-
-    case clock do
-      nil ->
-        IO.puts("Clock not found for user ID: #{user_id}")
-        {:error, "Clock not found"}
-
-      %Clock{status: current_status} = clock ->
-        new_status = not current_status  # Toggle the current status
-        changeset = Clock.changeset(clock, %{status: new_status})
-
-        case Repo.update(changeset) do
-          {:ok, updated_clock} ->
-            IO.puts("Clock updated successfully for user ID: #{user_id}")
-            {:ok, updated_clock}
-
-          {:error, changeset} ->
-            IO.puts("Failed to update clock for user ID: #{user_id}")
-            {:error, changeset}
-        end
-    end
-  end
-
-
-  def toggle_status(conn, %{"user_id" => user_id}) do
-    IO.puts("Received request to toggle status for user ID: #{user_id}")
-
-    case TimeManager.change_status_clock(user_id) do
-      {:ok, updated_clock} ->
-        IO.puts("Successfully toggled status for user ID: #{user_id}")
-        json(conn, %{data: updated_clock})
-
-      {:error, reason} ->
-        IO.puts("Error toggling status for user ID: #{user_id}, Reason: #{reason}")
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: reason})
-    end
-  end
-
-
-
-
-
-
 
 
   def show(conn, %{"id" => id}) do
@@ -110,4 +61,42 @@ defmodule TimeManagerWeb.ClockController do
       send_resp(conn, :no_content, "")
     end
   end
+
+  def toggle_status(conn, %{"userId" => user_id}) do
+    case TimeManagement.get_user_by_id(user_id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "User not found"})
+
+      _user ->
+        case TimeManagement.get_clock_for_user(user_id) do
+          nil ->
+            conn
+            |> put_status(:not_found)
+            |> json(%{error: "No clock found for this user."})
+
+          clock ->
+            case TimeManagement.change_status_clock(clock) do
+              {:ok, updated_clock} ->
+                conn
+                |> put_status(:ok)
+                |> json(%{
+                  success: "Clock status updated and workingtime created and updated",
+                  clock: updated_clock  # Ici on renvoie le clock mis à jour
+                })
+
+              {:error, reason} ->
+                conn
+                |> put_status(:bad_request)
+                |> json(%{error: "Failed to update clock", reason: reason})
+            end
+        end
+    end
+  end
+
+
+
+
+
 end

@@ -13,6 +13,8 @@ defmodule TimeManager.TimeManagement do
     Repo.all(Clock)
   end
 
+
+
   def get_clock!(id), do: Repo.get!(Clock, id)
 
   def create_clock(attrs \\ %{}) do
@@ -85,6 +87,7 @@ defmodule TimeManager.TimeManagement do
     Repo.one(query)
   end
 
+
   def list_workingtimes_with_params(start, end_w) do
     Repo.all(
       from u in Workingtime,
@@ -115,4 +118,42 @@ defmodule TimeManager.TimeManagement do
   def get_user_by_id(user_id) do
     Repo.get(User, user_id)
   end
+
+
+  def change_status_clock(%Clock{} = clock) do
+    if clock.status == true do
+      current_time = clock.time
+
+      {:ok, workingtime} = create_workingtime(%{
+        user_id: clock.user_id,
+        start: current_time
+      })
+
+      new_status = !clock.status
+      updated_time = NaiveDateTime.utc_now()
+
+      # Met à jour le clock et renvoie l'objet mis à jour
+      updated_clock =
+        clock
+        |> Clock.changeset(%{status: new_status, time: updated_time})
+        |> Repo.update!()
+
+      update_workingtime(workingtime, %{end_w: updated_time})
+
+      {:ok, updated_clock}  # Retourne l'objet clock mis à jour ici
+    else
+      new_status = !clock.status
+      current_time = NaiveDateTime.utc_now()
+
+      # Met à jour le clock et renvoie l'objet mis à jour
+      updated_clock =
+        clock
+        |> Clock.changeset(%{status: new_status, time: current_time})
+        |> Repo.update!()
+
+      {:ok, updated_clock}  # Retourne l'objet clock mis à jour ici
+    end
+  end
+
+
 end
