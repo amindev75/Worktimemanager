@@ -5,281 +5,25 @@
         <i class="fas fa-home"></i> Home
       </button>
     </div>
-    <h1 class="text-center mb-5">Statistiques des Utilisateurs</h1>
-    <select id="user-select" v-model="selectedUserId" @change="fetchWorkedDays">
-      <option disabled value="">Veuillez sélectionner un utilisateur</option>
-      <option v-for="user in users" :key="user.id" :value="user.id">
-        {{ user.username }}
-      </option>
-    </select>
+    <h1 class="text-center mb-5">Statistiques de {{ username }}</h1>
 
     <div style="margin: 8vh">
       <div class="row mb-4">
         <div class="col-md-4 chart-container">
-          <Bar :data="barData" :options="chartOptions" />
+          <Bar :key="chartKey" :data="barData" :options="chartOptions" />
         </div>
         <div class="col-md-4 chart-container">
-          <Line id="line-chart" :data="lineData" :options="chartOptions" />
+          <Doughnut :data="doughnutData" :options="doughnutOptions" />
         </div>
         <div class="col-md-4 chart-container">
-          <Pie id="pie-chart" :data="pieData" :options="chartOptions" />
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-6 chart-container">
-          <Doughnut
-            id="doughnut-chart"
-            :data="doughnutData"
-            :options="chartOptions"
-          />
-        </div>
-        <div class="col-md-6 chart-container">
-          <Radar id="radar-chart" :data="radarData" :options="chartOptions" />
+          <Line :data="lineData" :key="chartKey" :options="lineOptions" />
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { useRouter } from "vue-router";
-import { Bar, Line, Pie, Doughnut, Radar } from "vue-chartjs";
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  LineElement,
-  PointElement,
-  ArcElement,
-  RadialLinearScale,
-  CategoryScale,
-  LinearScale,
-} from "chart.js";
-
-// Register Chart.js components
-ChartJS.register(
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  LineElement,
-  PointElement,
-  ArcElement,
-  RadialLinearScale,
-  CategoryScale,
-  LinearScale
-);
-
-const router = useRouter();
-const goToHome = () => {
-  router.push("/");
-};
-
-// Sample chart data and options
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: "top",
-    },
-    title: {
-      display: true,
-      text: "Jours Travaillés par Mois",
-    },
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-    },
-  },
-};
-
-// Bar chart data
-const barData = {
-  labels: [
-    "Janvier",
-    "Février",
-    "Mars",
-    "Avril",
-    "Mai",
-    "Juin",
-    "Juillet",
-    "Août",
-    "Septembre",
-    "Octobre",
-    "Novembre",
-    "Décembre",
-  ],
-  datasets: [
-    {
-      label: "Jours travaillés (2024)",
-      backgroundColor: "#42A5F5",
-      data: [], // Initialisez avec un tableau vide
-    },
-  ],
-};
-
-// Line chart data
-const lineData = {
-  labels: ["January", "February", "March", "April", "May", "June"],
-  datasets: [
-    {
-      label: "Revenue 2024 (in $)",
-      borderColor: "#FF5733",
-      backgroundColor: "rgba(255, 87, 51, 0.2)",
-      data: [4500, 5200, 6300, 7000, 6700, 7500],
-      fill: true,
-    },
-  ],
-};
-
-// Pie chart data
-const pieData = {
-  labels: ["Product A", "Product B", "Product C"],
-  datasets: [
-    {
-      data: [300, 50, 100],
-      backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-      hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-    },
-  ],
-};
-
-// Doughnut chart data
-const doughnutData = {
-  labels: ["North", "South", "East", "West"],
-  datasets: [
-    {
-      data: [1200, 1900, 3000, 500],
-      backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
-      hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
-    },
-  ],
-};
-
-// Radar chart data
-const radarData = {
-  labels: ["Strength", "Speed", "Endurance", "Agility", "Intelligence"],
-  datasets: [
-    {
-      label: "Athlete 1",
-      backgroundColor: "rgba(179,181,198,0.2)",
-      borderColor: "rgba(179,181,198,1)",
-      pointBackgroundColor: "rgba(179,181,198,1)",
-      data: [65, 59, 90, 81, 56],
-    },
-    {
-      label: "Athlete 2",
-      backgroundColor: "rgba(255,99,132,0.2)",
-      borderColor: "rgba(255,99,132,1)",
-      pointBackgroundColor: "rgba(255,99,132,1)",
-      data: [28, 48, 40, 19, 96],
-    },
-  ],
-};
-</script>
-
-<script>
-import axios from "axios";
-
-export default {
-  data() {
-    return {
-      users: [], // Pour stocker les utilisateurs
-      selectedUserId: "", // Pour stocker l'ID de l'utilisateur sélectionné
-      workedDaysByMonth: {}, // Pour stocker les jours travaillés par mois
-      barData: {
-        // Ajoutez barData ici
-        labels: [
-          "Janvier",
-          "Février",
-          "Mars",
-          "Avril",
-          "Mai",
-          "Juin",
-          "Juillet",
-          "Août",
-          "Septembre",
-          "Octobre",
-          "Novembre",
-          "Décembre",
-        ],
-        datasets: [
-          {
-            label: "Jours travaillés (2024)",
-            backgroundColor: "#42A5F5",
-            data: [], // Initialisez avec un tableau vide
-          },
-        ],
-      },
-    };
-  },
-  mounted() {
-    this.fetchUsers(); // Récupérer les utilisateurs lorsque le composant est monté
-  },
-  methods: {
-    async fetchUsers() {
-      try {
-        const response = await axios.get("http://localhost:4000/api/users");
-        this.users = response.data.data; // Accédez à la propriété 'data'
-        console.log(this.users); // Pour vérifier le contenu
-      } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des utilisateurs :",
-          error
-        );
-      }
-    },
-
-    async fetchWorkedDays() {
-      if (!this.selectedUserId) return; // Ne rien faire si aucun utilisateur n'est sélectionné
-      try {
-        const response = await axios.get(
-          `http://localhost:4000/api/stats/${this.selectedUserId}/worked_days_by_month`
-        );
-        this.workedDaysByMonth = response.data.worked_days_by_month;
-
-        // Mettre à jour les données du graphique avec les jours travaillés
-        const months = [
-          "Janvier",
-          "Février",
-          "Mars",
-          "Avril",
-          "Mai",
-          "Juin",
-          "Juillet",
-          "Août",
-          "Septembre",
-          "Octobre",
-          "Novembre",
-          "Décembre",
-        ];
-
-        // Initialisez les données du graphique avec 0 pour chaque mois
-        const workedDaysArray = months.map(
-          (month) => this.workedDaysByMonth[month] || 0
-        );
-
-        // Mettre à jour les données du graphique
-        this.barData.datasets[0].data = workedDaysArray;
-
-        console.log("Données des jours travaillés :", this.workedDaysByMonth);
-      } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des jours travaillés :",
-          error
-        );
-      }
-    },
-  },
-};
-</script>
-
 <style scoped>
-/* Ensure no scrolling and a clean, even layout */
 .container-fluid {
   max-width: 100%;
   padding: 0 15px;
@@ -292,9 +36,231 @@ export default {
   border-radius: 5px;
 }
 
-/* Adjust chart responsiveness */
 canvas {
   max-width: 100% !important;
   height: auto !important;
 }
 </style>
+
+<script setup>
+import { ref, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+} from "chart.js";
+import axios from "axios";
+import { Bar, Doughnut, Line } from "vue-chartjs";
+
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  ArcElement,
+  LinearScale,
+  PointElement,
+  LineElement
+);
+
+const router = useRouter();
+const route = useRoute();
+const userId = route.params.userid;
+const username = ref("");
+
+const goToHome = () => router.push("/");
+
+const fetchUserDetails = async () => {
+  try {
+    const response = await axios.get(
+      `http://localhost:4000/api/users/${userId}`
+    );
+
+    if (response.data && response.data.data) {
+      username.value = response.data.data.username;
+    }
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des détails de l'utilisateur :",
+      error
+    );
+  }
+};
+
+onMounted(() => {
+  fetchUserDetails();
+});
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { position: "top" },
+    title: { display: true, text: "Jours Travaillés par Mois" },
+  },
+  scales: {
+    y: { beginAtZero: true },
+  },
+};
+
+const doughnutOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { position: "top" },
+    title: { display: true, text: "Pourcentage des heures hors standard" },
+  },
+};
+
+const lineOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { position: "top" },
+    title: { display: true, text: "Moyenne d'heures travaillées" },
+  },
+  scales: {
+    y: { beginAtZero: true },
+  },
+};
+
+const doughnutData = ref({
+  labels: ["Heures standards (8h - 16h)", "Heures hors standard"],
+  datasets: [
+    {
+      data: [0, 0],
+      backgroundColor: ["#36A2EB", "#FF6384"],
+      hoverBackgroundColor: ["#36A2EB", "#FF6384"],
+    },
+  ],
+});
+
+const getLast12Months = () => {
+  const months = [
+    "Janvier",
+    "Février",
+    "Mars",
+    "Avril",
+    "Mai",
+    "Juin",
+    "Juillet",
+    "Août",
+    "Septembre",
+    "Octobre",
+    "Novembre",
+    "Décembre",
+  ];
+  const result = [];
+  const today = new Date();
+  let currentMonth = today.getMonth();
+  for (let i = 0; i < 12; i++) {
+    result.unshift(months[currentMonth]);
+    currentMonth = (currentMonth - 1 + 12) % 12;
+  }
+  return result;
+};
+
+const getRandomColors = () => {
+  const colors = [];
+  for (let i = 0; i < 12; i++) {
+    const randomColor = `hsl(${Math.random() * 360}, 100%, 75%)`;
+    colors.push(randomColor);
+  }
+  return colors;
+};
+
+const barData = ref({
+  labels: getLast12Months(),
+  datasets: [
+    {
+      label: `Jours travaillés (${new Date().getFullYear()})`,
+      backgroundColor: getRandomColors(),
+      data: [],
+    },
+  ],
+});
+
+const lineData = ref({
+  labels: getLast12Months(),
+  datasets: [
+    {
+      label: `Moyenne d'heures travaillées`,
+      backgroundColor: "rgba(75, 192, 192, 0.2)",
+      borderColor: "rgba(75, 192, 192, 1)",
+      borderWidth: 2,
+      fill: true,
+      data: [],
+    },
+  ],
+});
+
+const chartKey = ref(0);
+
+const fetchWorkedDays = async () => {
+  if (!userId) return;
+
+  try {
+    const response = await axios.get(
+      `http://localhost:4000/api/stats/${userId}/worked_days_by_month`
+    );
+    const workedDaysByMonth = response.data.worked_days_by_month;
+
+    barData.value.datasets[0].data = Array.from({ length: 12 }, (v, i) => {
+      return workedDaysByMonth[i] || 0;
+    });
+
+    const percentageResponse = await axios.get(
+      `http://localhost:4000/api/stats/${userId}/calculate_percentage_working_times_outside_standard_hours`
+    );
+    const percentageOutside =
+      percentageResponse.data.percentage_outside_standard_hours;
+
+    doughnutData.value = {
+      labels: ["Heures standards (8h - 16h)", "Heures hors standard"],
+      datasets: [
+        {
+          data: [100 - percentageOutside, percentageOutside],
+          backgroundColor: ["#36A2EB", "#FF6384"],
+          hoverBackgroundColor: ["#36A2EB", "#FF6384"],
+        },
+      ],
+    };
+
+    const averageHoursResponse = await axios.get(
+      `http://localhost:4000/api/stats/${userId}/calculate_average_hours_worked_by_month`
+    );
+    const averageHoursByMonth =
+      averageHoursResponse.data.average_hours_by_month;
+
+    lineData.value.datasets[0].data = Array.from({ length: 12 }, (v, i) => {
+      return averageHoursByMonth[i] || 0;
+    });
+    lineData.value = { ...lineData.value };
+    chartKey.value += 1;
+
+    console.log(lineData.value.datasets[0].data);
+
+    barData.value.datasets[0].backgroundColor = getRandomColors();
+
+    chartKey.value += 1;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des jours travaillés :",
+      error
+    );
+  }
+};
+
+onMounted(() => {
+  fetchWorkedDays();
+});
+</script>

@@ -17,10 +17,6 @@ const goToWorkingTime = () => {
   router.push("/workingtime");
 };
 
-const goToUserStats = () => {
-  router.push("/chart_manager");
-};
-
 onMounted(async () => {
   try {
     const { data: userData } = await axios.get(`${baseURI}/user`);
@@ -41,9 +37,6 @@ onMounted(async () => {
       </button>
       <button class="btn btn-secondary mx-2" @click="goToWorkingTime">
         Gérer le temps de travail
-      </button>
-      <button class="btn btn-info mx-2" @click="goToUserStats">
-        Statistiques des utilisateurs
       </button>
     </div>
   </div>

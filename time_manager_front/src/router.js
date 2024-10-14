@@ -18,7 +18,7 @@ export const routes = [
     component: components["User"],
   },
   {
-    path: "/chart_manager",
+    path: "/chartManager/:userid",
     component: components["ChartManager"],
   },
   {

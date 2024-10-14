@@ -20,7 +20,6 @@
       <div v-for="user in users" :key="user.id" class="col-md-4 mb-3">
         <div class="card position-relative">
           <div class="card-body">
-            <!-- Point rouge ou vert en haut à droite -->
             <div
               v-if="clocks[user.id]"
               :class="{
@@ -44,6 +43,9 @@
                 @click="toggleClockStatus(user.id)"
               >
                 <i class="fas fa-sync-alt"></i> Toggle Status
+              </button>
+              <button class="btn btn-info" @click="viewStats(user.id)">
+                <i class="fas fa-chart-bar"></i> Stats
               </button>
             </div>
           </div>
@@ -203,6 +205,9 @@ export default {
     this.fetchUsers();
   },
   methods: {
+    viewStats(userId) {
+      this.$router.push({ path: `/chartManager/${userId}` });
+    },
     async toggleClockStatus(userId) {
       try {
         await axios
