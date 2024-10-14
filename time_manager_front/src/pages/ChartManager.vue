@@ -1,8 +1,8 @@
 <template>
   <div class="container-fluid mt-5">
     <div class="d-flex justify-content-between mb-4">
-      <button class="btn btn-light" @click="goToHome">
-        <i class="fas fa-home"></i> Home
+      <button class="btn btn-primary mx-2" @click="goToUserManagement">
+        <i class="fas fa-arrow-left"></i>
       </button>
     </div>
     <h1 class="text-center mb-5">Statistiques de {{ username }}</h1>
@@ -77,7 +77,9 @@ const route = useRoute();
 const userId = route.params.userid;
 const username = ref("");
 
-const goToHome = () => router.push("/");
+const goToUserManagement = () => {
+  router.push("/user_management");
+};
 
 const fetchUserDetails = async () => {
   try {

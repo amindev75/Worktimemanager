@@ -1,23 +1,16 @@
-alias TimeManager.Accounts.User
 alias TimeManager.TimeManagement.Workingtime
 alias TimeManager.Repo
-import Ecto.Query
+alias TimeManager.Accounts
 import Enum
 
-# Générer une fonction anonyme pour générer des heures aléatoires de début et de fin
 generate_random_working_time = fn base_date, day ->
-  # Génère un décalage aléatoire pour l'heure de début (entre 6h et 10h)
   random_start_hour = Enum.random(6..10)
   start_time = NaiveDateTime.add(base_date, day * 86400 + random_start_hour * 3600, :second)
-
-  # Durée aléatoire de travail entre 6 et 10 heures
   random_work_duration = Enum.random(6..10)
   end_time = NaiveDateTime.add(start_time, random_work_duration * 3600, :second)
-
   {start_time, end_time}
 end
 
-# Créer des utilisateurs
 users = [
   %{
     username: "user1",
@@ -34,26 +27,31 @@ users = [
 ]
 
 Enum.each(users, fn user_attrs ->
-  user = %User{}
-  |> User.changeset(user_attrs)
-  |> Repo.insert!()
+  case Accounts.create_user(user_attrs) do
+    {:ok, user} ->
+      base_date = ~N[2023-01-01 00:00:00]
 
-  base_date = ~N[2023-01-01 00:00:00]
+      for month <- 1..12 do
+        days_in_month = Enum.to_list(1..30)
+        missed_days = Enum.take_random(days_in_month, Enum.random(2..5))
+        worked_days = Enum.filter(days_in_month, fn day -> not Enum.member?(missed_days, day) end)
 
-  # Générer 365 working times pour chaque utilisateur avec des heures variées
-  working_times = for day <- 1..365 do
-    {start_time, end_time} = generate_random_working_time.(base_date, day)
+        Enum.each(worked_days, fn day ->
+          {start_time, end_time} = generate_random_working_time.(base_date, (month - 1) * 30 + day)
 
-    %{
-      start: start_time,
-      end_w: end_time,
-      user_id: user.id
-    }
+          wt_attrs = %{
+            start: start_time,
+            end_w: end_time,
+            user_id: user.id
+          }
+
+          %Workingtime{}
+          |> Workingtime.changeset(wt_attrs)
+          |> Repo.insert!()
+        end)
+      end
+
+    {:error, changeset} ->
+      IO.puts("Failed to create user: #{inspect(changeset)}")
   end
-
-  Enum.each(working_times, fn wt_attrs ->
-    %Workingtime{}
-    |> Workingtime.changeset(wt_attrs)
-    |> Repo.insert!()
-  end)
 end)

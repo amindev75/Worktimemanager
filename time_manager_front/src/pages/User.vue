@@ -33,16 +33,16 @@
             <p class="card-text">Email: {{ user.email }}</p>
             <div class="d-flex justify-content-between">
               <button class="btn btn-primary" @click="openEditModal(user)">
-                <i class="fas fa-edit"></i> Edit
+                <i class="fas fa-edit"></i>
               </button>
               <button class="btn btn-danger" @click="deleteUser(user.id)">
-                <i class="fas fa-trash-alt"></i> Delete
+                <i class="fas fa-trash-alt"></i>
               </button>
               <button
                 class="btn btn-warning"
                 @click="toggleClockStatus(user.id)"
               >
-                <i class="fas fa-sync-alt"></i> Toggle Status
+                <i class="fas fa-sync-alt"></i>
               </button>
               <button class="btn btn-info" @click="viewStats(user.id)">
                 <i class="fas fa-chart-bar"></i> Stats
