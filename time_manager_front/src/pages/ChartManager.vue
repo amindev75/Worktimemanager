@@ -20,6 +20,25 @@
         </div>
       </div>
     </div>
+    <div v-if="workingTimes.length > 0" class="mt-5">
+      <h3 class="text-center">Working Times</h3>
+      <table id="workingTimesTable" class="table table-striped">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Heure de départ</th>
+            <th>Heure d'arrivée</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="workingTime in workingTimes" :key="workingTime.id">
+            <td>{{ new Date(workingTime.start).toLocaleDateString() }}</td>
+            <td>{{ new Date(workingTime.start).toLocaleTimeString() }}</td>
+            <td>{{ new Date(workingTime.end_w).toLocaleTimeString() }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -41,7 +60,6 @@ canvas {
   height: auto !important;
 }
 </style>
-
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
@@ -59,7 +77,10 @@ import {
 } from "chart.js";
 import axios from "axios";
 import { Bar, Doughnut, Line } from "vue-chartjs";
+import "datatables.net-bs5";
+import $ from "jquery";
 
+// Enregistrement des composants Chart.js
 ChartJS.register(
   Title,
   Tooltip,
@@ -76,11 +97,14 @@ const router = useRouter();
 const route = useRoute();
 const userId = route.params.userid;
 const username = ref("");
+const workingTimes = ref([]);
 
+// Redirection vers la gestion des utilisateurs
 const goToUserManagement = () => {
   router.push("/user_management");
 };
 
+// Récupération des détails de l'utilisateur
 const fetchUserDetails = async () => {
   try {
     const response = await axios.get(
@@ -89,6 +113,8 @@ const fetchUserDetails = async () => {
 
     if (response.data && response.data.data) {
       username.value = response.data.data.username;
+      getWorkingTimes(response.data.data.id);
+      $("#workingTimesTable").DataTable();
     }
   } catch (error) {
     console.error(
@@ -98,10 +124,35 @@ const fetchUserDetails = async () => {
   }
 };
 
-onMounted(() => {
-  fetchUserDetails();
-});
+// Récupération des temps de travail
+const getWorkingTimes = async (userId) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:4000/api/workingtime/${userId}`
+    );
 
+    workingTimes.value = response.data.data || [];
+
+    return workingTimes.value;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des temps de travail :",
+      error
+    );
+    return [];
+  }
+};
+
+const getRandomColors = () => {
+  const colors = [];
+  for (let i = 0; i < 12; i++) {
+    const randomColor = `hsl(${Math.random() * 360}, 100%, 75%)`;
+    colors.push(randomColor);
+  }
+  return colors;
+};
+
+// Options pour les différents graphiques
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -135,6 +186,7 @@ const lineOptions = {
   },
 };
 
+// Données pour les graphiques
 const doughnutData = ref({
   labels: ["Heures standards (8h - 16h)", "Heures hors standard"],
   datasets: [
@@ -171,15 +223,6 @@ const getLast12Months = () => {
   return result;
 };
 
-const getRandomColors = () => {
-  const colors = [];
-  for (let i = 0; i < 12; i++) {
-    const randomColor = `hsl(${Math.random() * 360}, 100%, 75%)`;
-    colors.push(randomColor);
-  }
-  return colors;
-};
-
 const barData = ref({
   labels: getLast12Months(),
   datasets: [
@@ -207,6 +250,7 @@ const lineData = ref({
 
 const chartKey = ref(0);
 
+// Récupération des jours travaillés
 const fetchWorkedDays = async () => {
   if (!userId) return;
 
@@ -246,11 +290,8 @@ const fetchWorkedDays = async () => {
     lineData.value.datasets[0].data = Array.from({ length: 12 }, (v, i) => {
       return averageHoursByMonth[i] || 0;
     });
+
     lineData.value = { ...lineData.value };
-    chartKey.value += 1;
-
-    console.log(lineData.value.datasets[0].data);
-
     barData.value.datasets[0].backgroundColor = getRandomColors();
 
     chartKey.value += 1;
@@ -262,7 +303,18 @@ const fetchWorkedDays = async () => {
   }
 };
 
-onMounted(() => {
-  fetchWorkedDays();
+import { nextTick } from "vue";
+
+onMounted(async () => {
+  await fetchUserDetails();
+  await fetchWorkedDays();
+
+  // Attendre que Vue ait monté le DOM
+  nextTick(() => {
+    const table = document.getElementById("workingTimesTable");
+    if (table) {
+      $(table).DataTable();
+    }
+  });
 });
 </script>

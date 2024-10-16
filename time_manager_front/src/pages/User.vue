@@ -16,44 +16,59 @@
 
     <h1 class="text-center mb-5">Gestion des Utilisateurs</h1>
 
-    <div class="row">
-      <div v-for="user in users" :key="user.id" class="col-md-4 mb-3">
-        <div class="card position-relative">
-          <div class="card-body">
-            <div
-              v-if="clocks[user.id]"
-              :class="{
-                'bg-success': clocks[user.id].status,
-                'bg-danger': !clocks[user.id].status,
-              }"
-              class="status-indicator position-absolute rounded-circle"
-            ></div>
+    <div>
+      <input
+        type="text"
+        v-model="searchQuery"
+        placeholder="Rechercher par email ou username"
+        class="form-control"
+      /><br /><br />
 
-            <h5 class="card-title">{{ user.username }}</h5>
-            <p class="card-text">Email: {{ user.email }}</p>
-            <div class="d-flex justify-content-between">
-              <button class="btn btn-primary" @click="openEditModal(user)">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="btn btn-danger" @click="deleteUser(user.id)">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-              <button
-                class="btn btn-warning"
-                @click="toggleClockStatus(user.id)"
-              >
-                <i class="fas fa-sync-alt"></i>
-              </button>
-              <button class="btn btn-info" @click="viewStats(user.id)">
-                <i class="fas fa-chart-bar"></i> Stats
-              </button>
+      <div class="row">
+        <div v-for="user in filteredUsers" :key="user.id" class="col-md-4 mb-3">
+          <div
+            class="card card-hover position-relative"
+            @click="viewStats(user.id)"
+          >
+            <div class="card-body">
+              <div
+                v-if="clocks[user.id]"
+                :class="{
+                  'bg-success': clocks[user.id].status,
+                  'bg-danger': !clocks[user.id].status,
+                }"
+                class="status-indicator position-absolute rounded-circle"
+              ></div>
+
+              <h5 class="card-title">{{ user.username }}</h5>
+              <p class="card-text">Email: {{ user.email }}</p>
+
+              <div class="d-flex justify-content-between">
+                <button
+                  class="btn btn-primary"
+                  @click.stop="openEditModal(user)"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  class="btn btn-danger"
+                  @click.stop="deleteUser(user.id)"
+                >
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+                <button
+                  class="btn btn-warning"
+                  @click.stop="toggleClockStatus(user.id)"
+                >
+                  <i class="fas fa-sync-alt"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal pour ajouter un utilisateur -->
     <div
       class="modal fade"
       id="addUserModal"
@@ -105,7 +120,6 @@
       </div>
     </div>
 
-    <!-- Modal pour éditer un utilisateur -->
     <div
       class="modal fade"
       id="editUserModal"
@@ -166,6 +180,15 @@
   top: 10px;
   right: 10px;
 }
+
+.card-hover {
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.card-hover:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
 </style>
 
 <script>
@@ -177,6 +200,7 @@ export default {
   name: "UserManagement",
   data() {
     return {
+      searchQuery: "",
       users: [],
       clocks: {},
       newUser: {
@@ -189,6 +213,19 @@ export default {
         email: "",
       },
     };
+  },
+  computed: {
+    filteredUsers() {
+      if (!this.searchQuery.trim()) {
+        return this.users;
+      }
+      const query = this.searchQuery.toLowerCase();
+      return this.users.filter(
+        (user) =>
+          user.username.toLowerCase().includes(query) ||
+          user.email.toLowerCase().includes(query)
+      );
+    },
   },
   setup() {
     const router = useRouter();
@@ -210,19 +247,12 @@ export default {
     },
     async toggleClockStatus(userId) {
       try {
-        await axios
-          .put(`http://localhost:4000/api/clocks/${userId}/toggle_status`)
-          .then((res) => {
-            console.log("salut");
-            console.log(res.data); // Pour afficher la réponse complète
-            if (res.data && res.data.clock) {
-              console.log(res.data.clock); // Affiche les informations de clock
-              this.clocks[userId] = res.data.clock; // Mets à jour le clock de l'utilisateur
-            }
-          })
-          .catch((err) => {
-            console.error(err); // En cas d'erreur
-          });
+        const res = await axios.put(
+          `http://localhost:4000/api/clocks/${userId}/toggle_status`
+        );
+        if (res.data && res.data.clock) {
+          this.clocks[userId] = res.data.clock;
+        }
       } catch (error) {
         console.error(
           "Erreur lors de la mise à jour du statut du clock :",
@@ -236,7 +266,6 @@ export default {
         this.users = response.data.data;
         this.users.forEach(async (user) => {
           const clock = await this.fetchClock(user.id);
-          console.log("LA CLOCK", clock);
           if (clock) {
             this.clocks[user.id] = JSON.parse(JSON.stringify(clock));
           } else {
@@ -250,29 +279,17 @@ export default {
         );
       }
     },
-
     async fetchClock(userId) {
       try {
-        console.log(`Fetching clock for userId: ${userId}`);
         const response = await axios.get(
           `http://localhost:4000/api/clocks/${userId}`
         );
-
-        console.log("Response from API:", response);
-
-        if (response.data) {
-          console.log("Clock found:", response.data.data.id);
-          return response.data.data;
-        } else {
-          console.log(`No clock found for userId: ${userId}`);
-          return null;
-        }
+        return response.data.data || null;
       } catch (error) {
         console.error("Erreur lors de la récupération du clock :", error);
         return null;
       }
     },
-
     async addUser() {
       try {
         const response = await axios.post("http://localhost:4000/api/users", {
@@ -281,11 +298,8 @@ export default {
             email: this.newUser.email,
           },
         });
-
         this.users.push(response.data.data);
-
         this.newUser = { username: "", email: "" };
-
         const modalElement = document.getElementById("addUserModal");
         const modalInstance = bootstrap.Modal.getInstance(modalElement);
         if (modalInstance) {
@@ -295,11 +309,9 @@ export default {
         console.error("Erreur lors de la création de l'utilisateur :", error);
       }
     },
-
     async deleteUser(userId) {
       try {
         await axios.delete(`http://localhost:4000/api/users/${userId}`);
-
         this.users = this.users.filter((user) => user.id !== userId);
         delete this.clocks[userId];
       } catch (error) {
@@ -309,7 +321,6 @@ export default {
         );
       }
     },
-
     openEditModal(user) {
       this.selectedUser = { ...user };
       const editModal = new bootstrap.Modal(
@@ -317,7 +328,6 @@ export default {
       );
       editModal.show();
     },
-
     async editUser() {
       try {
         const response = await axios.put(
@@ -329,14 +339,12 @@ export default {
             },
           }
         );
-
         const index = this.users.findIndex(
           (user) => user.id === this.selectedUser.id
         );
         if (index !== -1) {
           this.users[index] = response.data.data;
         }
-
         const modalElement = document.getElementById("editUserModal");
         const modalInstance = bootstrap.Modal.getInstance(modalElement);
         if (modalInstance) {
