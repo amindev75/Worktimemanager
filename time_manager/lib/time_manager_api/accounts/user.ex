@@ -6,6 +6,8 @@ defmodule TimeManager.Accounts.User do
     field :username, :string
     field :email, :string
 
+    has_many :workingtimes, TimeManager.TimeManagement.Workingtime, on_delete: :delete_all
+    has_one :clock, TimeManager.TimeManagement.Clock, on_delete: :delete_all
     timestamps(type: :utc_datetime)
   end
 
