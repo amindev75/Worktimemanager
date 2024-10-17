@@ -4,10 +4,14 @@
       <button class="btn btn-primary mx-2" @click="goToUserManagement">
         <i class="fas fa-arrow-left"></i>
       </button>
+      <button class="btn btn-secondary mx-2" @click="toggleView">
+        {{ showStats ? "Afficher Working Times" : "Afficher Statistiques" }}
+      </button>
     </div>
+
     <h1 class="text-center mb-5">Statistiques de {{ username }}</h1>
 
-    <div style="margin: 8vh">
+    <div v-if="showStats" style="margin: 8vh">
       <div class="row mb-4">
         <div class="col-md-4 chart-container">
           <Bar :key="chartKey" :data="barData" :options="chartOptions" />
@@ -20,24 +24,25 @@
         </div>
       </div>
     </div>
-    <div v-if="workingTimes.length > 0" class="mt-5">
-      <h3 class="text-center">Working Times</h3>
-      <table id="workingTimesTable" class="table table-striped">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Heure de départ</th>
-            <th>Heure d'arrivée</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="workingTime in workingTimes" :key="workingTime.id">
-            <td>{{ new Date(workingTime.start).toLocaleDateString() }}</td>
-            <td>{{ new Date(workingTime.start).toLocaleTimeString() }}</td>
-            <td>{{ new Date(workingTime.end_w).toLocaleTimeString() }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div v-else>
+      <div v-if="workingTimes.length > 0" class="mt-5">
+        <table id="workingTimesTable" class="table table-striped">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Heure de départ</th>
+              <th>Heure d'arrivée</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="workingTime in workingTimes" :key="workingTime.id">
+              <td>{{ new Date(workingTime.start).toLocaleDateString() }}</td>
+              <td>{{ new Date(workingTime.start).toLocaleTimeString() }}</td>
+              <td>{{ new Date(workingTime.end_w).toLocaleTimeString() }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -60,6 +65,7 @@ canvas {
   height: auto !important;
 }
 </style>
+
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
@@ -303,13 +309,28 @@ const fetchWorkedDays = async () => {
   }
 };
 
+const initializeDataTable = () => {
+  const table = document.getElementById("workingTimesTable");
+  if (table) {
+    $(table).DataTable().destroy();
+    $(table).DataTable();
+    $("#workingTimesTable_wrapper").css("padding", "20px");
+  }
+};
+
+const toggleView = () => {
+  showStats.value = !showStats.value;
+  nextTick(() => {
+    initializeDataTable();
+  });
+};
 import { nextTick } from "vue";
+const showStats = ref(true);
 
 onMounted(async () => {
   await fetchUserDetails();
   await fetchWorkedDays();
 
-  // Attendre que Vue ait monté le DOM
   nextTick(() => {
     const table = document.getElementById("workingTimesTable");
     if (table) {
