@@ -37,6 +37,14 @@ end
       from u in User,
       where: u.email == ^email or u.username == ^username
     )
+    # Affiche la clé secrète
+secret_key_base = Application.get_env(:time_manager, TimeManagerWeb.Endpoint)[:secret_key_base]
+IO.puts("Secret Key Base: #{secret_key_base}")
+
+# Affiche la clé de signature
+signing_key = Application.get_env(:time_manager_api, TimeManager.Authentication)[:signing_key]
+IO.puts("Default Signer: #{signing_key}")
+
 
     IO.puts("Résultat de la requête: #{inspect(users)}")
 

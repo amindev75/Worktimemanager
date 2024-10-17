@@ -7,6 +7,15 @@
 # General application configuration
 import Config
 
+config :time_manager, TimeManagerWeb.Endpoint,
+  secret_key_base: "WNnRq60fyH/BLMWMUjNnS1IxMyjhV7UofMnGCyHfmUmEAZAxUiyiGbbhaR9flryW"
+
+config :joken, default_signer: [
+  alg: :hs256,  # Utilisez l'algorithme HMAC SHA-256
+  key: "WNnRq60fyH/BLMWMUjNnS1IxMyjhV7UofMnGCyHfmUmEAZAxUiyiGbbhaR9flryW"  # Utilisez la même clé que pour secret_key_base
+]
+
+
 config :time_manager_api,
   namespace: TimeManager,
   ecto_repos: [TimeManager.Repo],
@@ -32,6 +41,8 @@ config :time_manager_api, TimeManagerWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :time_manager_api, TimeManager.Mailer, adapter: Swoosh.Adapters.Local
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
+
 
 
 # Configure esbuild (the version is required)
