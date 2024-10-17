@@ -21,11 +21,6 @@ export const routes = [
     path: "/chartManager/:userid",
     component: components["ChartManager"],
   },
-  {
-    path: "/workingtime",
-    name: "WorkingTimePage",
-    component: components["Workingtime"],
-  },
 ];
 
 const router = createRouter({

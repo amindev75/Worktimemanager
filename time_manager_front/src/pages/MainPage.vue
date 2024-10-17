@@ -1,30 +1,11 @@
 <script setup>
-import { reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
-
-const baseURI = "http://localhost:3000";
-
-const users = reactive([]);
 
 const router = useRouter();
 
 const goToUserManagement = () => {
   router.push("/user_management");
 };
-
-const goToWorkingTime = () => {
-  router.push("/workingtime");
-};
-
-onMounted(async () => {
-  try {
-    const { data: userData } = await axios.get(`${baseURI}/user`);
-    users.push(...userData);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des utilisateurs :", error);
-  }
-});
 </script>
 
 <template>
@@ -34,9 +15,6 @@ onMounted(async () => {
     <div class="d-flex justify-content-center mb-4">
       <button class="btn btn-primary mx-2" @click="goToUserManagement">
         Gérer les utilisateurs
-      </button>
-      <button class="btn btn-secondary mx-2" @click="goToWorkingTime">
-        Gérer le temps de travail
       </button>
     </div>
   </div>
