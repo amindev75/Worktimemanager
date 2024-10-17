@@ -23,82 +23,73 @@
         placeholder="Rechercher par email ou username"
         class="form-control"
       /><br /><br />
+    </div>
 
-      <div>
+    <div
+      id="carouselExampleControls"
+      class="carousel slide"
+      data-bs-interval="false"
+    >
+      <div class="carousel-inner">
+        <!-- Boucle pour chaque groupe d'utilisateurs (9 par slide) -->
         <div
-          id="carouselExampleControls"
-          class="carousel slide"
-          data-bs-interval="false"
+          class="carousel-item"
+          v-for="(group, index) in chunkArray(filteredUsers, 9)"
+          :class="{ active: index === 0 }"
         >
-          <div class="carousel-inner">
-            <!-- Boucle pour chaque groupe d'utilisateurs (9 par slide) -->
-            <div
-              class="carousel-item"
-              v-for="(group, index) in chunkArray(filteredUsers, 9)"
-              :class="{ active: index === 0 }"
-            >
-              <div class="container">
-                <div class="row">
-                  <!-- Boucle pour chaque utilisateur dans le groupe -->
-                  <div
-                    class="col-md-4 mb-3"
-                    v-for="user in group"
-                    :key="user.id"
-                  >
-                    <div
-                      class="card card-hover position-relative"
-                      v-if="!user.isEmpty"
-                      @click="viewStats(user.id)"
-                    >
-                      <div class="card-body">
-                        <h5 class="card-title">{{ user.username }}</h5>
-                        <p class="card-text">Email: {{ user.email }}</p>
-                        <div class="d-flex justify-content-between">
-                          <button
-                            class="btn btn-primary"
-                            @click.stop="openEditModal(user)"
-                          >
-                            <i class="fas fa-edit"></i>
-                          </button>
-                          <button
-                            class="btn btn-danger"
-                            @click.stop="deleteUser(user.id)"
-                          >
-                            <i class="fas fa-trash-alt"></i>
-                          </button>
-                        </div>
-                      </div>
+          <div class="container">
+            <div class="row">
+              <!-- Boucle pour chaque utilisateur dans le groupe -->
+              <div class="col-md-4 mb-3" v-for="user in group" :key="user.id">
+                <div
+                  class="card card-hover position-relative"
+                  @click="viewStats(user.id)"
+                >
+                  <div class="card-body">
+                    <h5 class="card-title">{{ user.username }}</h5>
+                    <p class="card-text">Email: {{ user.email }}</p>
+                    <div class="d-flex justify-content-between">
+                      <button
+                        class="btn btn-primary"
+                        @click.stop="openEditModal(user)"
+                      >
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button
+                        class="btn btn-danger"
+                        @click.stop="deleteUser(user.id)"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
                     </div>
-                    <!-- Carte vide sans contenu -->
-                    <div class="card" v-else></div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        <div class="d-flex justify-content-center mt-3">
-          <button
-            class="btn btn-secondary me-2"
-            type="button"
-            data-bs-target="#carouselExampleControls"
-            data-bs-slide="prev"
-            id="prevButton"
-          >
-            Précédent
-          </button>
-          <button
-            class="btn btn-secondary ms-2"
-            type="button"
-            data-bs-target="#carouselExampleControls"
-            data-bs-slide="next"
-            id="nextButton"
-          >
-            Suivant
-          </button>
-        </div>
       </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-3">
+      <button
+        class="btn btn-secondary me-2"
+        type="button"
+        data-bs-target="#carouselExampleControls"
+        data-bs-slide="prev"
+        id="prevButton"
+      >
+        Précédent
+      </button>
+      <button
+        class="btn btn-secondary ms-2"
+        type="button"
+        data-bs-target="#carouselExampleControls"
+        data-bs-slide="next"
+        id="nextButton"
+      >
+        Suivant
+      </button>
     </div>
 
     <div
@@ -293,18 +284,13 @@ export default {
     this.fetchUsers();
   },
   methods: {
-    chunkArray(array, size) {
-      const chunked = [];
-      for (let i = 0; i < array.length; i += size) {
-        chunked.push(array.slice(i, i + size));
+    // Méthode pour diviser les utilisateurs en groupes de taille donnée
+    chunkArray(arr, size) {
+      let result = [];
+      for (let i = 0; i < arr.length; i += size) {
+        result.push(arr.slice(i, i + size));
       }
-      // Remplir les groupes avec des cartes vides pour garantir 9 éléments
-      chunked.forEach((group) => {
-        while (group.length < size) {
-          group.push({ id: null, username: "", email: "", isEmpty: true });
-        }
-      });
-      return chunked;
+      return result;
     },
 
     // Rediriger vers les statistiques de l'utilisateur
