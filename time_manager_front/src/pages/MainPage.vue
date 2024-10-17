@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 
 const goToUserManagement = () => {
-  router.push("/user_management");
+  router.push("/admin");
 };
 </script>
 

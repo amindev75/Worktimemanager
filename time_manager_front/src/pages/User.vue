@@ -32,11 +32,13 @@
     >
       <div class="carousel-inner">
         <!-- Boucle pour chaque groupe d'utilisateurs (9 par slide) -->
+<!--     eslint-disable -->
         <div
           class="carousel-item"
           v-for="(group, index) in chunkArray(filteredUsers, 9)"
           :class="{ active: index === 0 }"
         >
+          <UserOnly />
           <div class="container">
             <div class="row">
               <!-- Boucle pour chaque utilisateur dans le groupe -->

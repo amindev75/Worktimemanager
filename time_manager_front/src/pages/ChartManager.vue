@@ -107,7 +107,7 @@ const workingTimes = ref([]);
 
 // Redirection vers la gestion des utilisateurs
 const goToUserManagement = () => {
-  router.push("/user_management");
+  router.push("/admin");
 };
 
 // Récupération des détails de l'utilisateur
