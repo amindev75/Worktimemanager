@@ -23,50 +23,6 @@
         placeholder="Rechercher par email ou username"
         class="form-control"
       /><br /><br />
-
-      <div class="row">
-        <div v-for="user in filteredUsers" :key="user.id" class="col-md-4 mb-3">
-          <div
-            class="card card-hover position-relative"
-            @click="viewStats(user.id)"
-          >
-            <div class="card-body">
-              <div
-                v-if="clocks[user.id]"
-                :class="{
-                  'bg-success': clocks[user.id].status,
-                  'bg-danger': !clocks[user.id].status,
-                }"
-                class="status-indicator position-absolute rounded-circle"
-              ></div>
-
-              <h5 class="card-title">{{ user.username }}</h5>
-              <p class="card-text">Email: {{ user.email }}</p>
-
-              <div class="d-flex justify-content-between">
-                <button
-                  class="btn btn-primary"
-                  @click.stop="openEditModal(user)"
-                >
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button
-                  class="btn btn-danger"
-                  @click.stop="deleteUser(user.id)"
-                >
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-                <button
-                  class="btn btn-warning"
-                  @click.stop="toggleClockStatus(user.id)"
-                >
-                  <i class="fas fa-sync-alt"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div
@@ -174,6 +130,25 @@
 </template>
 
 <style>
+.custom-carousel-prev,
+.custom-carousel-next {
+  background-color: transparent; /* ou autre couleur */
+  border: none;
+  font-size: 24px; /* Ajuste la taille de la flèche */
+  color: #000; /* Couleur de la flèche */
+  padding: 10px;
+}
+
+.custom-arrow {
+  font-weight: bold;
+  display: inline-block;
+}
+
+.custom-carousel-prev:hover,
+.custom-carousel-next:hover {
+  color: #007bff; /* Changer la couleur au survol */
+}
+
 .status-indicator {
   width: 15px;
   height: 15px;
@@ -242,9 +217,21 @@ export default {
     this.fetchUsers();
   },
   methods: {
+    // Méthode pour diviser les utilisateurs en groupes de taille donnée
+    chunkArray(arr, size) {
+      let result = [];
+      for (let i = 0; i < arr.length; i += size) {
+        result.push(arr.slice(i, i + size));
+      }
+      return result;
+    },
+
+    // Rediriger vers les statistiques de l'utilisateur
     viewStats(userId) {
       this.$router.push({ path: `/chartManager/${userId}` });
     },
+
+    // Activer/Désactiver le statut du clock d'un utilisateur
     async toggleClockStatus(userId) {
       try {
         const res = await axios.put(
@@ -260,10 +247,13 @@ export default {
         );
       }
     },
+
+    // Récupérer la liste des utilisateurs et leurs clocks respectifs
     async fetchUsers() {
       try {
         const response = await axios.get("http://localhost:4000/api/users");
         this.users = response.data.data;
+        // Récupérer le clock pour chaque utilisateur
         this.users.forEach(async (user) => {
           const clock = await this.fetchClock(user.id);
           if (clock) {
@@ -279,6 +269,8 @@ export default {
         );
       }
     },
+
+    // Récupérer le clock d'un utilisateur par son ID
     async fetchClock(userId) {
       try {
         const response = await axios.get(
@@ -290,6 +282,8 @@ export default {
         return null;
       }
     },
+
+    // Ajouter un nouvel utilisateur
     async addUser() {
       try {
         const response = await axios.post("http://localhost:4000/api/users", {
@@ -309,6 +303,8 @@ export default {
         console.error("Erreur lors de la création de l'utilisateur :", error);
       }
     },
+
+    // Supprimer un utilisateur par son ID
     async deleteUser(userId) {
       try {
         await axios.delete(`http://localhost:4000/api/users/${userId}`);
@@ -321,6 +317,8 @@ export default {
         );
       }
     },
+
+    // Ouvrir la modale d'édition d'un utilisateur
     openEditModal(user) {
       this.selectedUser = { ...user };
       const editModal = new bootstrap.Modal(
@@ -328,6 +326,8 @@ export default {
       );
       editModal.show();
     },
+
+    // Modifier un utilisateur
     async editUser() {
       try {
         const response = await axios.put(
