@@ -45,7 +45,7 @@ const login = async () => {
 
 <template>
   <div class="container mt-5">
-    <h1 class="text-center mb-5">Bienvenue sur votre espace admin</h1>
+    <h1 class="text-center mb-5">Bienvenue sur Time Manager</h1>
 
     <!-- Formulaire de connexion -->
     <div class="login-form mb-5">
