@@ -3,6 +3,8 @@ defmodule TimeManagerWeb.UserController do
 
   alias TimeManager.Accounts
   alias TimeManager.Accounts.User
+  import Joken
+
 
   action_fallback TimeManagerWeb.FallbackController
 
@@ -43,6 +45,32 @@ defmodule TimeManagerWeb.UserController do
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/users/#{user}")
       |> render(:show, user: user)
+    end
+  end
+
+  def me(conn, _params) do
+    # Récupérer le token JWT des en-têtes de la requête
+    token = get_req_header(conn, "authorization")
+            |> List.first()
+            |> String.replace("Bearer ", "")
+
+
+    signer = Joken.Signer.create("HS256", "your_secret_key")
+
+    # Décoder et vérifier le token
+    case Joken.verify_and_validate(token, signer) do
+      {:ok, claims} ->
+        user_id = claims["user_id"]
+        user = Accounts.get_user!(user_id)
+
+        conn
+        |> put_status(:ok)
+        |> json(%{user: user})
+
+      {:error, reason} ->
+        conn
+        |> put_status(:unauthorized)
+        |> json(%{error: "Invalid token", reason: reason})
     end
   end
 

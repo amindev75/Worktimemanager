@@ -1,9 +1,15 @@
 <template>
   <div class="container mt-5">
     <div class="d-flex justify-content-between mb-4">
-      <button class="btn btn-light" @click="goToHome">
-        <i class="fas fa-home"></i> Home
-      </button>
+      <div class="d-flex">
+        <button class="btn btn-light" @click="goToHome">
+          <i class="fas fa-home"></i> Home
+        </button>
+
+        <button class="btn btn-danger ms-2" @click="logout">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
 
       <button
         class="btn btn-success"
@@ -284,6 +290,24 @@ export default {
     this.fetchUsers();
   },
   methods: {
+    // Déconnexion de l'utilisateur
+    async logout() {
+      try {
+        const token = localStorage.getItem("authToken");
+        // Appelle la route DELETE pour déconnexion
+        await axios.delete("http://localhost:4000/api/logout", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        localStorage.removeItem("authToken"); // Supprimer le token du localStorage
+        this.$router.push("/"); // Rediriger l'utilisateur vers la page de connexion
+      } catch (error) {
+        console.error("Erreur lors de la déconnexion :", error);
+      }
+    },
+
     // Méthode pour diviser les utilisateurs en groupes de taille donnée
     chunkArray(arr, size) {
       let result = [];

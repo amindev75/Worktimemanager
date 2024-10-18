@@ -28,7 +28,7 @@ const login = async () => {
     console.log("Login successful, token:", token);
 
     // Exemple : rediriger vers l'espace utilisateur après la connexion
-    router.push("/dashboard");
+    router.push("/user_management");
   } catch (error) {
     errorMessage.value =
       "Erreur lors de la connexion. Vérifiez vos identifiants.";
