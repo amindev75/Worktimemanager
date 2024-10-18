@@ -59,9 +59,11 @@ defmodule TimeManager.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:phoenix_html, "~> 3.0"} # Ajout de phoenix_html pour les vues
     ]
   end
+
 
   # Aliases are shortcuts or tasks specific to the current project.
   # For example, to install project dependencies and perform other setup tasks, run:

@@ -38,7 +38,7 @@
     >
       <div class="carousel-inner">
         <!-- Boucle pour chaque groupe d'utilisateurs (9 par slide) -->
-<!--     eslint-disable -->
+        <!--     eslint-disable -->
         <div
           class="carousel-item"
           v-for="(group, index) in chunkArray(filteredUsers, 9)"
@@ -246,6 +246,7 @@
 import axios from "axios";
 import { useRouter } from "vue-router";
 import * as bootstrap from "bootstrap";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "UserManagement",
@@ -280,13 +281,14 @@ export default {
   },
   setup() {
     const router = useRouter();
-
+    const toast = useToast();
     const goToHome = () => {
       router.push("/");
     };
 
     return {
       goToHome,
+      toast,
     };
   },
   mounted() {
@@ -305,12 +307,15 @@ export default {
         });
 
         localStorage.removeItem("authToken"); // Supprimer le token du localStorage
-        this.$router.push("/"); // Rediriger l'utilisateur vers la page de connexion
+
+        // Utilisation de toast depuis setup pour afficher la notification
+        this.toast.success("Déconnexion réussie.");
+
+        this.$router.push("/"); // Rediriger l'utilisateur vers la page principale
       } catch (error) {
         console.error("Erreur lors de la déconnexion :", error);
       }
     },
-
     // Méthode pour diviser les utilisateurs en groupes de taille donnée
     chunkArray(arr, size) {
       let result = [];
@@ -328,8 +333,15 @@ export default {
     // Activer/Désactiver le statut du clock d'un utilisateur
     async toggleClockStatus(userId) {
       try {
+        const token = localStorage.getItem("authToken");
         const res = await axios.put(
-          `http://localhost:4000/api/clocks/${userId}/toggle_status`
+          `http://localhost:4000/api/clocks/${userId}/toggle_status`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         if (res.data && res.data.clock) {
           this.clocks[userId] = res.data.clock;
@@ -345,7 +357,12 @@ export default {
     // Récupérer la liste des utilisateurs et leurs clocks respectifs
     async fetchUsers() {
       try {
-        const response = await axios.get("http://localhost:4000/api/users");
+        const token = localStorage.getItem("authToken");
+        const response = await axios.get("http://localhost:4000/api/users", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         this.users = response.data.data;
         // Récupérer le clock pour chaque utilisateur
         this.users.forEach(async (user) => {
@@ -367,8 +384,14 @@ export default {
     // Récupérer le clock d'un utilisateur par son ID
     async fetchClock(userId) {
       try {
+        const token = localStorage.getItem("authToken");
         const response = await axios.get(
-          `http://localhost:4000/api/clocks/${userId}`
+          `http://localhost:4000/api/clocks/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         return response.data.data || null;
       } catch (error) {
@@ -380,12 +403,21 @@ export default {
     // Ajouter un nouvel utilisateur
     async addUser() {
       try {
-        const response = await axios.post("http://localhost:4000/api/users", {
-          user: {
-            username: this.newUser.username,
-            email: this.newUser.email,
+        const token = localStorage.getItem("authToken");
+        const response = await axios.post(
+          "http://localhost:4000/api/users",
+          {
+            user: {
+              username: this.newUser.username,
+              email: this.newUser.email,
+            },
           },
-        });
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         this.users.push(response.data.data);
         this.newUser = { username: "", email: "" };
         const modalElement = document.getElementById("addUserModal");
@@ -401,7 +433,12 @@ export default {
     // Supprimer un utilisateur par son ID
     async deleteUser(userId) {
       try {
-        await axios.delete(`http://localhost:4000/api/users/${userId}`);
+        const token = localStorage.getItem("authToken");
+        await axios.delete(`http://localhost:4000/api/users/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         this.users = this.users.filter((user) => user.id !== userId);
         delete this.clocks[userId];
       } catch (error) {
@@ -424,12 +461,18 @@ export default {
     // Modifier un utilisateur
     async editUser() {
       try {
+        const token = localStorage.getItem("authToken");
         const response = await axios.put(
           `http://localhost:4000/api/users/${this.selectedUser.id}`,
           {
             user: {
               username: this.selectedUser.username,
               email: this.selectedUser.email,
+            },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
             },
           }
         );

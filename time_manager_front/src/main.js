@@ -7,9 +7,11 @@ import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
 const app = createApp(App);
 
 app.use(BootstrapVueNext);
 app.use(router);
-
+app.use(Toast);
 app.mount("#app");

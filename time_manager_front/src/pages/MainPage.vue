@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
 import axios from "axios"; // Pour faire des requêtes HTTP
 
 const router = useRouter();
@@ -16,6 +17,7 @@ const goToUserManagement = () => {
 };
 
 // Fonction de login
+const toast = useToast();
 const login = async () => {
   try {
     const response = await axios.post("http://localhost:4000/api/login", {
@@ -23,15 +25,17 @@ const login = async () => {
       password: password.value,
     });
 
-    // Si la connexion est réussie, tu peux stocker le token ou rediriger
+    // Si la connexion est réussie, tu peux stocker le token dans localStorage
     const token = response.data.token;
     console.log("Login successful, token:", token);
 
-    // Exemple : rediriger vers l'espace utilisateur après la connexion
-    router.push("/user_management");
+    // Stocker le token dans localStorage
+    localStorage.setItem("authToken", token);
+
+    // Rediriger vers l'espace utilisateur après la connexion
+    router.push("/admin");
   } catch (error) {
-    errorMessage.value =
-      "Erreur lors de la connexion. Vérifiez vos identifiants.";
+    toast.error("Erreur lors de la connexion. Vérifiez vos identifiants.");
     console.error("Login error:", error);
   }
 };
