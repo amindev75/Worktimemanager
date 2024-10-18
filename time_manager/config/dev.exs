@@ -1,6 +1,6 @@
 import Config
 
-# Configure your database
+
 config :time_manager_api, TimeManager.Repo,
   username: "postgres",
   password: "postgresql",
@@ -9,6 +9,7 @@ config :time_manager_api, TimeManager.Repo,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
+
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -23,7 +24,7 @@ config :time_manager_api, TimeManagerWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "qUkCaWstI9FiVPlPTp6g9X3FL+VB5UsxZGCLZEdroVXU+wVFI+9c7BrZPz1lScI/",
+  secret_key_base: "WNnRq60fyH/BLMWMUjNnS1IxMyjhV7UofMnGCyHfmUmEAZAxUiyiGbbhaR9flryW",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:time_manager_api, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:time_manager_api, ~w(--watch)]}

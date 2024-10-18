@@ -14,15 +14,21 @@ end
 users = [
   %{
     username: "user1",
-    email: "user1@example.com"
+    email: "user1@test.com",
+    password: "123456",
+    role: 0
   },
   %{
     username: "user2",
-    email: "user2@example.com"
+    email: "user2@test.com",
+    password: "123456",
+    role: 1
   },
   %{
     username: "user3",
-    email: "user3@example.com"
+    email: "user3@test.com",
+    password: "123456",
+    role: 2
   }
 ]
 

@@ -28,7 +28,9 @@ end
 
 
 
-
+def get_user_by_email(email) do
+  Repo.get_by(User, email: email)
+end
 
   def list_users_with_params(email, username) do
     users = Repo.all(

@@ -7,6 +7,9 @@
 # General application configuration
 import Config
 
+config :joken, default_signer: "WNnRq60fyH/BLMWMUjNnS1IxMyjhV7UofMnGCyHfmUmEAZAxUiyiGbbhaR9flryW"
+
+
 config :time_manager_api,
   namespace: TimeManager,
   ecto_repos: [TimeManager.Repo],
@@ -32,6 +35,8 @@ config :time_manager_api, TimeManagerWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :time_manager_api, TimeManager.Mailer, adapter: Swoosh.Adapters.Local
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
+
 
 
 # Configure esbuild (the version is required)
