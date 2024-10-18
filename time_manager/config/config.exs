@@ -7,13 +7,7 @@
 # General application configuration
 import Config
 
-config :time_manager, TimeManagerWeb.Endpoint,
-  secret_key_base: "WNnRq60fyH/BLMWMUjNnS1IxMyjhV7UofMnGCyHfmUmEAZAxUiyiGbbhaR9flryW"
-
-config :joken, default_signer: [
-  alg: :hs256,  # Utilisez l'algorithme HMAC SHA-256
-  key: "WNnRq60fyH/BLMWMUjNnS1IxMyjhV7UofMnGCyHfmUmEAZAxUiyiGbbhaR9flryW"  # Utilisez la même clé que pour secret_key_base
-]
+config :joken, default_signer: "WNnRq60fyH/BLMWMUjNnS1IxMyjhV7UofMnGCyHfmUmEAZAxUiyiGbbhaR9flryW"
 
 
 config :time_manager_api,
