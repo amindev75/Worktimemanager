@@ -42,6 +42,7 @@
           class="carousel-item"
           v-for="(group, index) in chunkArray(filteredUsers, 9)"
           :class="{ active: index === 0 }"
+          :key="index"
         >
           <div class="container">
             <div class="row">
