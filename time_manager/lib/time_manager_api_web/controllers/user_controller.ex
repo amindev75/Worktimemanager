@@ -21,6 +21,7 @@ defmodule TimeManagerWeb.UserController do
         end
       _ ->
         users = Accounts.list_users_with_clocks()
+
         render(conn, "index.json", users: users)
     end
   end

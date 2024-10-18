@@ -1,22 +1,16 @@
 <template>
   <div class="container mt-5">
     <div class="d-flex justify-content-between mb-4">
-      <div class="d-flex">
-        <button class="btn btn-light" @click="goToHome">
-          <i class="fas fa-home"></i> Home
-        </button>
-
-        <button class="btn btn-danger ms-2" @click="logout">
-          <i class="fas fa-sign-out-alt"></i>
-        </button>
-      </div>
-
       <button
         class="btn btn-success"
         data-bs-toggle="modal"
         data-bs-target="#addUserModal"
       >
         <i class="fas fa-plus"></i> Ajouter un utilisateur
+      </button>
+
+      <button class="btn btn-danger ms-2" @click="logout">
+        <i class="fas fa-sign-out-alt"></i>
       </button>
     </div>
 
@@ -57,6 +51,7 @@
                   <div class="card-body">
                     <h5 class="card-title">{{ user.username }}</h5>
                     <p class="card-text">Email: {{ user.email }}</p>
+
                     <div class="d-flex justify-content-between">
                       <button
                         class="btn btn-primary"
@@ -145,6 +140,20 @@
                   required
                 />
               </div>
+              <div class="mb-3">
+                <label for="role" class="form-label">Rôle</label>
+                <select
+                  class="form-select"
+                  id="role"
+                  v-model="newUser.role"
+                  required
+                >
+                  <option value="0">Employé</option>
+                  <option value="1">Manager</option>
+                  <option value="2">Admin</option>
+                </select>
+              </div>
+
               <button type="submit" class="btn btn-primary">Ajouter</button>
             </form>
           </div>
@@ -244,7 +253,6 @@
 
 <script>
 import axios from "axios";
-import { useRouter } from "vue-router";
 import * as bootstrap from "bootstrap";
 import { useToast } from "vue-toastification";
 
@@ -258,11 +266,13 @@ export default {
       newUser: {
         username: "",
         email: "",
+        role: 0,
       },
       selectedUser: {
         id: null,
         username: "",
         email: "",
+        role: 0,
       },
     };
   },
@@ -280,14 +290,9 @@ export default {
     },
   },
   setup() {
-    const router = useRouter();
     const toast = useToast();
-    const goToHome = () => {
-      router.push("/");
-    };
 
     return {
-      goToHome,
       toast,
     };
   },
@@ -363,8 +368,8 @@ export default {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log(response.data);
         this.users = response.data.data;
-        // Récupérer le clock pour chaque utilisateur
         this.users.forEach(async (user) => {
           const clock = await this.fetchClock(user.id);
           if (clock) {
@@ -380,7 +385,6 @@ export default {
         );
       }
     },
-
     // Récupérer le clock d'un utilisateur par son ID
     async fetchClock(userId) {
       try {
@@ -410,6 +414,7 @@ export default {
             user: {
               username: this.newUser.username,
               email: this.newUser.email,
+              role: this.newUser.role,
             },
           },
           {

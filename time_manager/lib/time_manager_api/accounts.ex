@@ -77,6 +77,12 @@ end
   """
 def create_user(attrs \\ %{}, clock_attrs \\ %{}) do
   Repo.transaction(fn ->
+
+    attrs = Map.put_new(attrs, "password", "123456")
+
+    # Assure-toi que toutes les clés sont des chaînes
+    attrs = Enum.into(attrs, %{}, fn {k, v} -> {to_string(k), v} end)
+
     {:ok, %User{} = user} =
       %User{}
       |> User.changeset(attrs)
@@ -94,6 +100,8 @@ def create_user(attrs \\ %{}, clock_attrs \\ %{}) do
     user
   end)
 end
+
+
 
 defp create_clock(attrs \\ %{}) do
   %Clock{}

@@ -11,11 +11,6 @@ const email = ref("");
 const password = ref("");
 const errorMessage = ref("");
 
-// Redirection vers la gestion des utilisateurs
-const goToUserManagement = () => {
-  router.push("/admin");
-};
-
 // Fonction de login
 const toast = useToast();
 const login = async () => {
@@ -28,6 +23,7 @@ const login = async () => {
     // Si la connexion est réussie, tu peux stocker le token dans localStorage
     const token = response.data.token;
     console.log("Login successful, token:", token);
+    toast.success("Connexion réussie.");
 
     // Stocker le token dans localStorage
     localStorage.setItem("authToken", token);
@@ -81,13 +77,6 @@ const login = async () => {
       <div v-if="errorMessage" class="alert alert-danger mt-3">
         {{ errorMessage }}
       </div>
-    </div>
-
-    <!-- Bouton pour la gestion des utilisateurs -->
-    <div class="d-flex justify-content-center">
-      <button class="btn btn-secondary mx-2" @click="goToUserManagement">
-        Gérer les utilisateurs
-      </button>
     </div>
   </div>
 </template>

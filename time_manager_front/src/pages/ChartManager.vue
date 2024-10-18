@@ -67,7 +67,7 @@ canvas {
 </style>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import {
   Chart as ChartJS,
@@ -113,8 +113,14 @@ const goToUserManagement = () => {
 // Récupération des détails de l'utilisateur
 const fetchUserDetails = async () => {
   try {
+    const token = localStorage.getItem("authToken"); // Récupère le token JWT
     const response = await axios.get(
-      `http://localhost:4000/api/users/${userId}`
+      `http://localhost:4000/api/users/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Ajout du token JWT dans l'en-tête
+        },
+      }
     );
 
     if (response.data && response.data.data) {
@@ -133,12 +139,17 @@ const fetchUserDetails = async () => {
 // Récupération des temps de travail
 const getWorkingTimes = async (userId) => {
   try {
+    const token = localStorage.getItem("authToken"); // Récupère le token JWT
     const response = await axios.get(
-      `http://localhost:4000/api/workingtime/${userId}`
+      `http://localhost:4000/api/workingtime/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Ajout du token JWT dans l'en-tête
+        },
+      }
     );
 
     workingTimes.value = response.data.data || [];
-
     return workingTimes.value;
   } catch (error) {
     console.error(
@@ -261,8 +272,14 @@ const fetchWorkedDays = async () => {
   if (!userId) return;
 
   try {
+    const token = localStorage.getItem("authToken"); // Récupère le token JWT
     const response = await axios.get(
-      `http://localhost:4000/api/stats/${userId}/worked_days_by_month`
+      `http://localhost:4000/api/stats/${userId}/worked_days_by_month`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Ajout du token JWT dans l'en-tête
+        },
+      }
     );
     const workedDaysByMonth = response.data.worked_days_by_month;
 
@@ -271,7 +288,12 @@ const fetchWorkedDays = async () => {
     });
 
     const percentageResponse = await axios.get(
-      `http://localhost:4000/api/stats/${userId}/calculate_percentage_working_times_outside_standard_hours`
+      `http://localhost:4000/api/stats/${userId}/calculate_percentage_working_times_outside_standard_hours`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Ajout du token JWT dans l'en-tête
+        },
+      }
     );
     const percentageOutside =
       percentageResponse.data.percentage_outside_standard_hours;
@@ -288,7 +310,12 @@ const fetchWorkedDays = async () => {
     };
 
     const averageHoursResponse = await axios.get(
-      `http://localhost:4000/api/stats/${userId}/calculate_average_hours_worked_by_month`
+      `http://localhost:4000/api/stats/${userId}/calculate_average_hours_worked_by_month`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Ajout du token JWT dans l'en-tête
+        },
+      }
     );
     const averageHoursByMonth =
       averageHoursResponse.data.average_hours_by_month;
@@ -324,7 +351,7 @@ const toggleView = () => {
     initializeDataTable();
   });
 };
-import { nextTick } from "vue";
+
 const showStats = ref(true);
 
 onMounted(async () => {
