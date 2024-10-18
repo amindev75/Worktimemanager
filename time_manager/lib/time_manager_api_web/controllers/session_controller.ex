@@ -11,19 +11,28 @@ defmodule TimeManagerWeb.SessionController do
 
       extra_claims = %{user_id: user.id}
 
-      # Génération du token avec le signataire par défaut
       {:ok, token, _claims} = Joken.generate_and_sign(extra_claims)
 
       conn
       |> put_status(:ok)
-      |> render(TimeManagerWeb.SessionJSON, "login.json", %{token: token})
+      |> json(%{
+           message: "Login Successful",
+           success: true,
+           token: token,
+           user: %{
+             id: user.id,
+             role: user.role
+           }
+         })
     else
       _ ->
         conn
         |> put_status(:unauthorized)
-        |> render(TimeManagerWeb.SessionJSON, "error.json", %{error: "Invalid credentials"})
+        |> json(%{error: "Invalid credentials"})
     end
   end
+
+
 
 
 

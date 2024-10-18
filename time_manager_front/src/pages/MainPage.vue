@@ -2,16 +2,14 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
-import axios from "axios"; // Pour faire des requêtes HTTP
+import axios from "axios";
 
 const router = useRouter();
 
-// Références pour les champs du formulaire
 const email = ref("");
 const password = ref("");
 const errorMessage = ref("");
 
-// Fonction de login
 const toast = useToast();
 const login = async () => {
   try {
@@ -20,16 +18,24 @@ const login = async () => {
       password: password.value,
     });
 
-    // Si la connexion est réussie, tu peux stocker le token dans localStorage
+    console.log("Response data:", response.data);
+
     const token = response.data.token;
+    const userRole = response.data.user.role;
+    const userID = response.data.user.id;
+
     console.log("Login successful, token:", token);
     toast.success("Connexion réussie.");
 
-    // Stocker le token dans localStorage
     localStorage.setItem("authToken", token);
 
-    // Rediriger vers l'espace utilisateur après la connexion
-    router.push("/admin");
+    if (userRole === 2) {
+      router.push("/admin");
+    } else if (userRole === 1) {
+      router.push("/manager");
+    } else {
+      router.push(`/chartManager/${userID}`);
+    }
   } catch (error) {
     toast.error("Erreur lors de la connexion. Vérifiez vos identifiants.");
     console.error("Login error:", error);
