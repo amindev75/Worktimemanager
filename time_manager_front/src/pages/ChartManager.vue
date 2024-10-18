@@ -7,6 +7,9 @@
       <button class="btn btn-secondary mx-2" @click="toggleView">
         {{ showStats ? "Afficher Working Times" : "Afficher Statistiques" }}
       </button>
+      <button class="btn btn-danger ms-2" @click="logout">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
     </div>
 
     <h1 class="text-center mb-5">Statistiques de {{ username }}</h1>
@@ -85,6 +88,7 @@ import axios from "axios";
 import { Bar, Doughnut, Line } from "vue-chartjs";
 import "datatables.net-bs5";
 import $ from "jquery";
+import { useToast } from "vue-toastification";
 
 // Enregistrement des composants Chart.js
 ChartJS.register(
@@ -110,15 +114,42 @@ const goToUserManagement = () => {
   router.push("/admin");
 };
 
-// Récupération des détails de l'utilisateur
+const toast = useToast();
+async function logout() {
+  try {
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      toast.error("Aucun token trouvé, vous êtes peut-être déjà déconnecté.");
+      return;
+    }
+
+    await axios.delete("http://localhost:4000/api/logout", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    localStorage.removeItem("authToken");
+
+    toast.success("Déconnexion réussie.");
+
+    router.push("/");
+  } catch (error) {
+    console.error("Erreur lors de la déconnexion :", error);
+
+    toast.error("Erreur lors de la déconnexion. Veuillez réessayer.");
+  }
+}
+
 const fetchUserDetails = async () => {
   try {
-    const token = localStorage.getItem("authToken"); // Récupère le token JWT
+    const token = localStorage.getItem("authToken");
     const response = await axios.get(
       `http://localhost:4000/api/users/${userId}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`, // Ajout du token JWT dans l'en-tête
+          Authorization: `Bearer ${token}`,
         },
       }
     );

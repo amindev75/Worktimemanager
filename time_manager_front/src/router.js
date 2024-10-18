@@ -37,21 +37,41 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("authToken"); // Vérifie si le token existe dans localStorage
-  const toast = useToast(); // Utiliser la notification
+  const token = localStorage.getItem("authToken");
+  const userRole = localStorage.getItem("userRole");
+  const userId = localStorage.getItem("userId");
+  const toast = useToast();
 
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!token) {
       toast.error(
         "Attention, vous devez être connecté pour accéder à cette page."
       );
-
-      next("/");
+      next(false);
     } else {
-      next();
+      if (to.path === "/admin" && userRole !== "2") {
+        toast.error("Accès refusé. Vous devez être administrateur.");
+        next(false);
+      } else if (to.path === "/manager" && userRole !== "1") {
+        toast.error("Accès refusé. Vous devez être manager.");
+        next(false);
+      } else if (to.path.startsWith("/chartManager/")) {
+        const targetUserId = to.params.userid;
+
+        if (userRole === "0" && userId !== targetUserId) {
+          toast.error(
+            "Accès refusé. Vous ne pouvez pas accéder à ce graphique."
+          );
+          next(false);
+        } else {
+          next();
+        }
+      } else {
+        next();
+      }
     }
   } else {
-    next(); // Si la page ne nécessite pas d'authentification, continuer
+    next();
   }
 });
 

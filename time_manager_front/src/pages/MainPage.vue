@@ -25,9 +25,12 @@ const login = async () => {
     const userID = response.data.user.id;
 
     console.log("Login successful, token:", token);
+    console.log("Login successful, ID:", userID);
     toast.success("Connexion réussie.");
 
     localStorage.setItem("authToken", token);
+    localStorage.setItem("userRole", userRole);
+    localStorage.setItem("userId", userID);
 
     if (userRole === 2) {
       router.push("/admin");
