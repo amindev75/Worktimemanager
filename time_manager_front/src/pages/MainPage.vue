@@ -12,7 +12,7 @@ const errorMessage = ref("");
 
 // Redirection vers la gestion des utilisateurs
 const goToUserManagement = () => {
-  router.push("/user_management");
+  router.push("/admin");
 };
 
 // Fonction de login

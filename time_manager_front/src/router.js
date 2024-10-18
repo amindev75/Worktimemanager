@@ -14,7 +14,7 @@ export const routes = [
     component: components["MainPage"],
   },
   {
-    path: "/user_management",
+    path: "/admin",
     component: components["User"],
   },
   {
