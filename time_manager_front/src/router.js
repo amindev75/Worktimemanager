@@ -47,7 +47,7 @@ router.beforeEach((to, from, next) => {
       toast.error(
         "Attention, vous devez être connecté pour accéder à cette page."
       );
-      next(false);
+      next("/");
     } else {
       if (to.path === "/admin" && userRole !== "2") {
         toast.error("Accès refusé. Vous devez être administrateur.");
