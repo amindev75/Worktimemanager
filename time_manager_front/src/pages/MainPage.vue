@@ -2,21 +2,14 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
-import axios from "axios"; // Pour faire des requêtes HTTP
+import axios from "axios";
 
 const router = useRouter();
 
-// Références pour les champs du formulaire
 const email = ref("");
 const password = ref("");
 const errorMessage = ref("");
 
-// Redirection vers la gestion des utilisateurs
-const goToUserManagement = () => {
-  router.push("/admin");
-};
-
-// Fonction de login
 const toast = useToast();
 const login = async () => {
   try {
@@ -25,15 +18,24 @@ const login = async () => {
       password: password.value,
     });
 
-    // Si la connexion est réussie, tu peux stocker le token dans localStorage
-    const token = response.data.token;
-    console.log("Login successful, token:", token);
+    console.log("Response data:", response.data);
 
-    // Stocker le token dans localStorage
+    const token = response.data.token;
+    const userRole = response.data.user.role;
+    const userID = response.data.user.id;
+
+    console.log("Login successful, token:", token);
+    toast.success("Connexion réussie.");
+
     localStorage.setItem("authToken", token);
 
-    // Rediriger vers l'espace utilisateur après la connexion
-    router.push("/admin");
+    if (userRole === 2) {
+      router.push("/admin");
+    } else if (userRole === 1) {
+      router.push("/manager");
+    } else {
+      router.push(`/chartManager/${userID}`);
+    }
   } catch (error) {
     toast.error("Erreur lors de la connexion. Vérifiez vos identifiants.");
     console.error("Login error:", error);
@@ -81,13 +83,6 @@ const login = async () => {
       <div v-if="errorMessage" class="alert alert-danger mt-3">
         {{ errorMessage }}
       </div>
-    </div>
-
-    <!-- Bouton pour la gestion des utilisateurs -->
-    <div class="d-flex justify-content-center">
-      <button class="btn btn-secondary mx-2" @click="goToUserManagement">
-        Gérer les utilisateurs
-      </button>
     </div>
   </div>
 </template>

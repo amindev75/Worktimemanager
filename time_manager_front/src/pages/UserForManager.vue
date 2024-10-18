@@ -1,14 +1,6 @@
 <template>
   <div class="container mt-5">
     <div class="d-flex justify-content-between mb-4">
-      <button
-        class="btn btn-success"
-        data-bs-toggle="modal"
-        data-bs-target="#addUserModal"
-      >
-        <i class="fas fa-plus"></i> Ajouter un utilisateur
-      </button>
-
       <button class="btn btn-danger ms-2" @click="logout">
         <i class="fas fa-sign-out-alt"></i>
       </button>
@@ -51,21 +43,6 @@
                   <div class="card-body">
                     <h5 class="card-title">{{ user.username }}</h5>
                     <p class="card-text">Email: {{ user.email }}</p>
-
-                    <div class="d-flex justify-content-between">
-                      <button
-                        class="btn btn-primary"
-                        @click.stop="openEditModal(user)"
-                      >
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button
-                        class="btn btn-danger"
-                        @click.stop="deleteUser(user.id)"
-                      >
-                        <i class="fas fa-trash-alt"></i>
-                      </button>
-                    </div>
                   </div>
                 </div>
               </div>
