@@ -15,6 +15,7 @@ defmodule TimeManagerWeb.WorkingtimeController do
         TimeManagement.list_workingtimes()
     end
     render(conn, "index.json", workingtimes: workingtimes)
+
   end
 
   def create(conn, %{"workingtime" => workingtime_params, "userId" => user_id}) do
