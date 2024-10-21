@@ -1,0 +1,41 @@
+services:
+  phoenix-app:
+    build:
+      context: ./time_manager
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: "ecto://postgres:postgres@db:5432/worktime_manager_prod"
+      SECRET_KEY_BASE: "4y4rFb+M2nsYEoHTLc2/0AszTGENdhF86wPttbA0PLqqlyxmzX4yjvDNRuKB98vt"
+      MIX_ENV: prod
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./time_manager:/app
+    depends_on:
+      - db
+    command: ["sh", "-c", "mix ecto.migrate && mix run priv/repo/seeds.exs && mix phx.server"]
+
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: worktime_manager_prod
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  vuejs-app:
+    build:
+      context: ./time_manager_front
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ./time_manager_front:/app
+    command: ["/bin/sh", "-c", "nginx -g 'daemon off;'"]
+    depends_on:
+      - phoenix-app
+
+volumes:
+  pgdata:
