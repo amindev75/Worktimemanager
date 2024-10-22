@@ -1,1 +1,1 @@
-web: mix phx.server
+web: cd backend && mix phx.server
