@@ -65,7 +65,7 @@
 alias TimeManager.TimeManagement.Workingtime
 alias TimeManager.Repo
 alias TimeManager.Accounts
-import Enum
+#import Enum
 
 generate_random_working_time = fn base_date, day ->
   random_start_hour = Enum.random(6..10)
